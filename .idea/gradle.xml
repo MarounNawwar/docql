@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT">
+            <builds>
+              <build path="$PROJECT_DIR$/buildSrc" name="buildSrc">
+                <projects>
+                  <project path="$PROJECT_DIR$/buildSrc" />
+                </projects>
+              </build>
+            </builds>
+          </compositeBuild>
+        </compositeConfiguration>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/buildSrc" />
+            <option value="$PROJECT_DIR$/cje" />
+            <option value="$PROJECT_DIR$/cje/api" />
+            <option value="$PROJECT_DIR$/cje/factory" />
+            <option value="$PROJECT_DIR$/cje/impl-local" />
+            <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/core/api" />
+            <option value="$PROJECT_DIR$/db" />
+            <option value="$PROJECT_DIR$/db/api" />
+            <option value="$PROJECT_DIR$/db/factory" />
+            <option value="$PROJECT_DIR$/db/impl-postgres" />
+            <option value="$PROJECT_DIR$/discovery" />
+            <option value="$PROJECT_DIR$/discovery/api" />
+            <option value="$PROJECT_DIR$/discovery/factory" />
+            <option value="$PROJECT_DIR$/discovery/impl" />
+            <option value="$PROJECT_DIR$/publish" />
+            <option value="$PROJECT_DIR$/publish/api" />
+            <option value="$PROJECT_DIR$/publish/factory" />
+            <option value="$PROJECT_DIR$/publish/impl" />
+            <option value="$PROJECT_DIR$/search" />
+            <option value="$PROJECT_DIR$/search/api" />
+            <option value="$PROJECT_DIR$/search/factory" />
+            <option value="$PROJECT_DIR$/search/impl-lucene" />
+            <option value="$PROJECT_DIR$/storage" />
+            <option value="$PROJECT_DIR$/storage/api" />
+            <option value="$PROJECT_DIR$/storage/factory" />
+            <option value="$PROJECT_DIR$/storage/impl-fs" />
+            <option value="$PROJECT_DIR$/web" />
+            <option value="$PROJECT_DIR$/web/api" />
+            <option value="$PROJECT_DIR$/web/impl" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
