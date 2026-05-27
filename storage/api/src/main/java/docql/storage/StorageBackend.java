@@ -20,4 +20,3 @@ public interface StorageBackend {
 
     boolean exists(String key);
 }
-

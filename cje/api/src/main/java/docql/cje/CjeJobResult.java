@@ -5,4 +5,3 @@ public record CjeJobResult(
         CjeJobStatus status,
         String message
 ) {}
-

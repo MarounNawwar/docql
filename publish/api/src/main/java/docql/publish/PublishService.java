@@ -14,4 +14,3 @@ public interface PublishService {
     /** Retract (delete) a specific version of a package. */
     void retract(String team, String product, String version);
 }
-

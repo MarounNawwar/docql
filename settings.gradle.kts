@@ -6,17 +6,17 @@ include(":core:api")
 // Database abstraction
 include(":db:api")
 include(":db:factory")
-include(":db:impl-postgres")
+include(":db:postgres")
 
 // File storage abstraction
 include(":storage:api")
 include(":storage:factory")
-include(":storage:impl-fs")
+include(":storage:fs")
 
 // CJE (Content/Job Engine) abstraction
 include(":cje:api")
 include(":cje:factory")
-include(":cje:impl-local")
+include(":cje:local")
 
 // Publishing domain
 include(":publish:api")
@@ -31,7 +31,7 @@ include(":discovery:impl")
 // Search abstraction
 include(":search:api")
 include(":search:factory")
-include(":search:impl-lucene")
+include(":search:lucene")
 
 // Web REST layer
 include(":web:api")

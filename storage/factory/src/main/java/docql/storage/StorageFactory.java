@@ -6,4 +6,3 @@ package docql.storage;
 public interface StorageFactory {
     StorageBackend storageBackend();
 }
-

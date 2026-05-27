@@ -6,4 +6,3 @@ package docql.discovery;
 public interface DiscoveryFactory {
     DiscoveryService discoveryService();
 }
-

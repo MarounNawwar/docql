@@ -7,4 +7,3 @@ package docql.search;
 public interface SearchFactory {
     SearchEngine searchEngine();
 }
-

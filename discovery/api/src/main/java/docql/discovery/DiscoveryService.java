@@ -27,4 +27,3 @@ public interface DiscoveryService {
 
     List<DocFile> listFiles(String team, String product, String version);
 }
-

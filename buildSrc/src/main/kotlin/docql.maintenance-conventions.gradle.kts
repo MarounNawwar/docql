@@ -4,10 +4,6 @@ plugins {
     pmd
 }
 
-val enforceQualityOnCheck = providers.gradleProperty("docql.enforceQualityOnCheck")
-    .map(String::toBoolean)
-    .orElse(false)
-
 spotless {
     java {
         target("src/**/*.java")
@@ -43,8 +39,6 @@ tasks.register("qualityCheck") {
 }
 
 tasks.named("check") {
-    if (enforceQualityOnCheck.get()) {
-        dependsOn("qualityCheck")
-    }
+    dependsOn("qualityCheck")
 }
 

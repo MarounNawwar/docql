@@ -34,4 +34,3 @@ public final class WebMapper {
                 result.version(), result.filePath(), result.title(), result.snippet());
     }
 }
-

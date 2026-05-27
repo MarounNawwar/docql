@@ -10,4 +10,3 @@ public interface DbFactory {
 
     DocFileRepository fileRepository();
 }
-

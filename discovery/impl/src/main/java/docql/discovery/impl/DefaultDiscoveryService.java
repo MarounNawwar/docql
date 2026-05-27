@@ -55,4 +55,3 @@ public class DefaultDiscoveryService implements DiscoveryService {
                 .orElse(List.of());
     }
 }
-

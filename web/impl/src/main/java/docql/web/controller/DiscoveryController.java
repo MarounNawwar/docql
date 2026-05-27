@@ -1,6 +1,5 @@
 package docql.web.controller;
 
-import docql.core.DocFile;
 import docql.discovery.DiscoveryService;
 import docql.web.dto.DocPackageDto;
 import docql.web.mapper.WebMapper;
@@ -97,4 +96,3 @@ public class DiscoveryController {
         return value != null ? value : "";
     }
 }
-

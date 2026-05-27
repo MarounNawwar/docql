@@ -28,4 +28,3 @@ public class DefaultPublishFactory implements PublishFactory {
         return publishService;
     }
 }
-

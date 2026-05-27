@@ -39,4 +39,3 @@ public class PublishController {
         publishService.retract(team, product, version);
     }
 }
-

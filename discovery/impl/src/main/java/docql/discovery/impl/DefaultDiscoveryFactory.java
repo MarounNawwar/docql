@@ -21,4 +21,3 @@ public class DefaultDiscoveryFactory implements DiscoveryFactory {
         return discoveryService;
     }
 }
-

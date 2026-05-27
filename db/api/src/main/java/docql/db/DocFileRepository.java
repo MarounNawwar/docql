@@ -20,4 +20,3 @@ public interface DocFileRepository {
 
     void deleteByPackageId(String packageId);
 }
-

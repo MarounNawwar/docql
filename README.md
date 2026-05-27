@@ -9,28 +9,37 @@ Multi-module Gradle project with convention plugins defined in `buildSrc`.
 - `docql.packaging-conventions`: reproducible archives, `sourcesJar`, `javadocJar`, and `mavenJava` publication.
 - `docql.java-conventions`: composed convention for standard modules (common + testing + packaging).
 - `docql.spring-conventions`: Spring Boot modules, consumes `docql.java-conventions`, configures Boot dependency BOM.
-- `docql.maintenance-conventions`: Spotless + PMD quality tooling (opt-in, see below).
+- `docql.maintenance-conventions`: Spotless + PMD quality tooling.
 
-## Maintenance conventions (opt-in)
+## Module naming conventions
 
-Maintenance conventions are available but not auto-enabled to avoid breaking existing checks.
+- Keep shared contracts in `api` modules.
+- Keep creation/selection logic in `factory` modules.
+- Name concrete backend modules after the backend or technology itself when it is explicit, for example `postgres`, `fs`, `local`, or `lucene`.
+- Use `impl` only when there is a single obvious implementation for a domain and there is no better technology-specific name.
 
-Enable them for all modules:
+## Maintenance conventions
+
+Maintenance tasks are available on all Java/Spring modules.
+
+Quality enforcement on `check` remains opt-in so existing modules do not start failing unexpectedly.
+
+Make `check` enforce formatting/static analysis too:
 
 ```powershell
-.\gradlew.bat check -P"docql.enableMaintenanceConventions=true" -P"docql.enforceQualityOnCheck=true"
+.\gradlew.bat check -P"docql.enforceQualityOnCheck=true"
 ```
 
 Run quality checks explicitly:
 
 ```powershell
-.\gradlew.bat qualityCheck -P"docql.enableMaintenanceConventions=true"
+.\gradlew.bat qualityCheck
 ```
 
 Apply formatting fixes:
 
 ```powershell
-.\gradlew.bat spotlessApply -P"docql.enableMaintenanceConventions=true"
+.\gradlew.bat spotlessApply
 ```
 
 

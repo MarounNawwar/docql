@@ -9,4 +9,3 @@ public record DocFile(
         String title,
         String content
 ) {}
-

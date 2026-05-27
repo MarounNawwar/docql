@@ -11,4 +11,3 @@ public record PublishRequestDto(
         String indexFilePath,
         List<DocFileDto> files
 ) {}
-

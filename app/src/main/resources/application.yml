@@ -4,4 +4,3 @@ server:
 docql:
   storage:
     root: docql-storage
-

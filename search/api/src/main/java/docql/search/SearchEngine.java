@@ -27,4 +27,3 @@ public interface SearchEngine {
      */
     List<SearchResult> search(String query, List<String> tags, String team);
 }
-

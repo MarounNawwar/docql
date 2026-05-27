@@ -6,4 +6,3 @@ public record DocFileDto(
         String title,
         String content
 ) {}
-

@@ -9,4 +9,3 @@ public class ResourceNotFoundException extends RuntimeException {
         super("Package not found: " + team + "/" + product + "/" + version);
     }
 }
-

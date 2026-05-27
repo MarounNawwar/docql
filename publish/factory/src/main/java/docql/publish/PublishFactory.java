@@ -6,4 +6,3 @@ package docql.publish;
 public interface PublishFactory {
     PublishService publishService();
 }
-

@@ -10,4 +10,3 @@ public record SearchResultDto(
         String title,
         String snippet
 ) {}
-

@@ -7,4 +7,3 @@ package docql.cje;
 public interface CjeEngine {
     CjeJobResult submit(CjeJob job);
 }
-

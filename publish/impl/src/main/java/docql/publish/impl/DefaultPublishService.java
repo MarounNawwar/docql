@@ -84,4 +84,3 @@ public class DefaultPublishService implements PublishService {
         return team + "/" + product + "/" + version + "/" + path;
     }
 }
-

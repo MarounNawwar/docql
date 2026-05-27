@@ -13,17 +13,17 @@ dependencies {
     // db
     implementation(project(":db:api"))
     implementation(project(":db:factory"))
-    implementation(project(":db:impl-postgres"))
+    implementation(project(":db:postgres"))
 
     // storage
     implementation(project(":storage:api"))
     implementation(project(":storage:factory"))
-    implementation(project(":storage:impl-fs"))
+    implementation(project(":storage:fs"))
 
     // cje
     implementation(project(":cje:api"))
     implementation(project(":cje:factory"))
-    implementation(project(":cje:impl-local"))
+    implementation(project(":cje:local"))
 
     // publish
     implementation(project(":publish:api"))
@@ -38,7 +38,7 @@ dependencies {
     // search
     implementation(project(":search:api"))
     implementation(project(":search:factory"))
-    implementation(project(":search:impl-lucene"))
+    implementation(project(":search:lucene"))
 
     // web
     implementation(project(":web:api"))

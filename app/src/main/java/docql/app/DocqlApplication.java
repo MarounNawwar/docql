@@ -10,4 +10,3 @@ public class DocqlApplication {
         SpringApplication.run(DocqlApplication.class, args);
     }
 }
-

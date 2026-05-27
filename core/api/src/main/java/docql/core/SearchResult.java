@@ -12,4 +12,3 @@ public record SearchResult(
         String title,
         String snippet
 ) {}
-

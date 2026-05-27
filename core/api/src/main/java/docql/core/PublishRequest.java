@@ -13,4 +13,3 @@ public record PublishRequest(
         List<DocFile> files,
         String indexFilePath
 ) {}
-

@@ -13,4 +13,3 @@ public record DocPackageDto(
         Instant publishedAt,
         String indexFilePath
 ) {}
-

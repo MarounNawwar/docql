@@ -6,4 +6,3 @@ package docql.cje;
 public interface CjeFactory {
     CjeEngine cjeEngine();
 }
-

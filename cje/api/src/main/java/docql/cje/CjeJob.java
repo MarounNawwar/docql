@@ -5,4 +5,3 @@ public record CjeJob(
         String type,
         String payload
 ) {}
-
