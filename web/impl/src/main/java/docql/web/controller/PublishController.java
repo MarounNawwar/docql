@@ -26,7 +26,9 @@ public class PublishController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public DocPackageDto publish(@RequestBody PublishRequestDto dto) {
-        return WebMapper.toDto(publishService.publish(WebMapper.toDomain(dto)));
+        return WebMapper.INSTANCE.toDocPackageDto(
+                publishService.publish(WebMapper.INSTANCE.toPublishRequest(dto))
+        );
     }
 
     @DeleteMapping("/{team}/{product}/{version}")

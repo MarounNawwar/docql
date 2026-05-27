@@ -1,0 +1,41 @@
+[versions]
+# Core
+java = "21"
+
+# Spring Boot & Framework
+springBoot = "3.3.0"
+
+# API Documentation
+springdoc-openapi = "2.3.0"
+
+# Code Generation & Mapping
+mapstruct = "1.5.5.Final"
+
+# Search Engine
+lucene = "9.10.0"
+
+# Build Plugins
+spotless = "6.25.0"
+
+[libraries]
+# Spring Boot BOM (Bills of Materials)
+spring-boot-bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "springBoot" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBoot" }
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "springBoot" }
+
+# OpenAPI / Swagger UI
+springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc-openapi" }
+
+# MapStruct (DTO Mapping)
+mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
+mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
+
+# Lucene (Full-text Search)
+lucene-core = { module = "org.apache.lucene:lucene-core", version.ref = "lucene" }
+lucene-queryparser = { module = "org.apache.lucene:lucene-queryparser", version.ref = "lucene" }
+lucene-analysis-common = { module = "org.apache.lucene:lucene-analysis-common", version.ref = "lucene" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+

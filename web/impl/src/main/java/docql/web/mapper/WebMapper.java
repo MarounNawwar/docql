@@ -4,33 +4,28 @@ import docql.core.DocFile;
 import docql.core.DocPackage;
 import docql.core.PublishRequest;
 import docql.core.SearchResult;
-import docql.web.dto.*;
-
-import java.util.List;
+import docql.web.dto.DocFileDto;
+import docql.web.dto.DocPackageDto;
+import docql.web.dto.PublishRequestDto;
+import docql.web.dto.SearchResultDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
 /**
- * Stateless mapper between domain model and web DTOs.
- * Kept separate so controllers stay thin.
+ * MapStruct-based mapper between domain model and web DTOs.
+ * Automatically generated implementation handles conversions.
  */
-public final class WebMapper {
+@Mapper
+public interface WebMapper {
+    WebMapper INSTANCE = Mappers.getMapper(WebMapper.class);
 
-    private WebMapper() {}
+    @Mapping(target = "packageId", constant = "null")
+    DocFile toDocFile(DocFileDto dto);
 
-    public static PublishRequest toDomain(PublishRequestDto dto) {
-        List<DocFile> files = dto.files().stream()
-                .map(f -> new DocFile(null, f.path(), f.title(), f.content()))
-                .toList();
-        return new PublishRequest(dto.team(), dto.product(), dto.version(),
-                dto.tags(), files, dto.indexFilePath());
-    }
+    PublishRequest toPublishRequest(PublishRequestDto dto);
 
-    public static DocPackageDto toDto(DocPackage pkg) {
-        return new DocPackageDto(pkg.id(), pkg.team(), pkg.product(),
-                pkg.version(), pkg.tags(), pkg.publishedAt(), pkg.indexFilePath());
-    }
+    DocPackageDto toDocPackageDto(DocPackage pkg);
 
-    public static SearchResultDto toDto(SearchResult result) {
-        return new SearchResultDto(result.packageId(), result.team(), result.product(),
-                result.version(), result.filePath(), result.title(), result.snippet());
-    }
+    SearchResultDto toSearchResultDto(SearchResult result);
 }

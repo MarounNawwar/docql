@@ -44,5 +44,5 @@ dependencies {
     implementation(project(":web:api"))
     implementation(project(":web:impl"))
 
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation(libs.spring.boot.starter.web)
 }

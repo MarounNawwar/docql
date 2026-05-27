@@ -30,7 +30,7 @@ public class SearchController {
             @RequestParam(required = false, defaultValue = "") List<String> tags
     ) {
         return searchEngine.search(q, tags, team).stream()
-                .map(WebMapper::toDto)
+                .map(WebMapper.INSTANCE::toSearchResultDto)
                 .toList();
     }
 }

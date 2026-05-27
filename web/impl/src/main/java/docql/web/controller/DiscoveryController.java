@@ -35,15 +35,15 @@ public class DiscoveryController {
             @RequestParam(required = false) String team,
             @RequestParam(required = false) String tag
     ) {
-        if (team != null) return discoveryService.listByTeam(team).stream().map(WebMapper::toDto).toList();
-        if (tag  != null) return discoveryService.listByTag(tag).stream().map(WebMapper::toDto).toList();
-        return discoveryService.listAll().stream().map(WebMapper::toDto).toList();
+        if (team != null) return discoveryService.listByTeam(team).stream().map(WebMapper.INSTANCE::toDocPackageDto).toList();
+        if (tag  != null) return discoveryService.listByTag(tag).stream().map(WebMapper.INSTANCE::toDocPackageDto).toList();
+        return discoveryService.listAll().stream().map(WebMapper.INSTANCE::toDocPackageDto).toList();
     }
 
     @GetMapping("/{team}/{product}")
     public DocPackageDto findLatest(@PathVariable String team, @PathVariable String product) {
         return discoveryService.findLatest(team, product)
-                .map(WebMapper::toDto)
+                .map(WebMapper.INSTANCE::toDocPackageDto)
                 .orElseThrow(() -> new ResourceNotFoundException(team, product, "latest"));
     }
 
@@ -54,7 +54,7 @@ public class DiscoveryController {
             @PathVariable String version
     ) {
         return discoveryService.findVersion(team, product, version)
-                .map(WebMapper::toDto)
+                .map(WebMapper.INSTANCE::toDocPackageDto)
                 .orElseThrow(() -> new ResourceNotFoundException(team, product, version));
     }
 
