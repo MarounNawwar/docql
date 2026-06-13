@@ -8,41 +8,46 @@ tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
 
 dependencies {
     // core
-    implementation(project(":core:api"))
+    implementation(project(":backend:core:api"))
 
     // db
-    implementation(project(":db:api"))
-    implementation(project(":db:factory"))
-    implementation(project(":db:postgres"))
+    implementation(project(":backend:db:api"))
+    implementation(project(":backend:db:factory"))
+    implementation(project(":backend:db:postgres"))
 
     // storage
-    implementation(project(":storage:api"))
-    implementation(project(":storage:factory"))
-    implementation(project(":storage:fs"))
+    implementation(project(":backend:storage:api"))
+    implementation(project(":backend:storage:factory"))
+    implementation(project(":backend:storage:fs"))
 
     // cje
-    implementation(project(":cje:api"))
-    implementation(project(":cje:factory"))
-    implementation(project(":cje:local"))
+    implementation(project(":backend:cje:api"))
+    implementation(project(":backend:cje:factory"))
+    implementation(project(":backend:cje:local"))
 
     // publish
-    implementation(project(":publish:api"))
-    implementation(project(":publish:factory"))
-    implementation(project(":publish:impl"))
+    implementation(project(":backend:publish:api"))
+    implementation(project(":backend:publish:factory"))
+    implementation(project(":backend:publish:impl"))
 
     // discovery
-    implementation(project(":discovery:api"))
-    implementation(project(":discovery:factory"))
-    implementation(project(":discovery:impl"))
+    implementation(project(":backend:discovery:api"))
+    implementation(project(":backend:discovery:factory"))
+    implementation(project(":backend:discovery:impl"))
 
     // search
-    implementation(project(":search:api"))
-    implementation(project(":search:factory"))
-    implementation(project(":search:lucene"))
+    implementation(project(":backend:search:api"))
+    implementation(project(":backend:search:factory"))
+    implementation(project(":backend:search:lucene"))
 
     // web
-    implementation(project(":web:api"))
-    implementation(project(":web:impl"))
+    implementation(project(":backend:web:api"))
+    implementation(project(":web:service"))
 
     implementation(libs.spring.boot.starter.web)
+
+    // JPA runtime + Postgres driver + Flyway
+    implementation(libs.spring.boot.starter.data.jpa)
+    runtimeOnly(libs.postgresql)
+    implementation(libs.flyway.core)
 }

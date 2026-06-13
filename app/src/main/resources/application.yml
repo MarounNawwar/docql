@@ -1,6 +1,32 @@
 server:
   port: 8080
 
+spring:
+  datasource:
+    url: ${DOCQL_DB_URL:jdbc:postgresql://localhost:5432/docql}
+    username: ${DOCQL_DB_USER:docql}
+    password: ${DOCQL_DB_PASSWORD:docql}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate          # Flyway owns DDL — Hibernate must not alter the schema
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
 docql:
+  db:
+    impl: ${DOCQL_DB_IMPL:postgres}
+  cje:
+    impl: ${DOCQL_CJE_IMPL:local}
+  publish:
+    impl: ${DOCQL_PUBLISH_IMPL:default}
+  discovery:
+    impl: ${DOCQL_DISCOVERY_IMPL:default}
   storage:
-    root: docql-storage
+    impl: ${DOCQL_STORAGE_IMPL:fs}
+    root: ${DOCQL_STORAGE_ROOT:docql-storage}
+  search:
+    impl: ${DOCQL_SEARCH_IMPL:lucene}
+    index-dir: ${DOCQL_SEARCH_INDEX_DIR:docql-index}

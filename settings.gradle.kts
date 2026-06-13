@@ -1,41 +1,41 @@
 rootProject.name = "docql"
 
 // Core shared domain model
-include(":core:api")
+include(":backend:core:api")
 
 // Database abstraction
-include(":db:api")
-include(":db:factory")
-include(":db:postgres")
+include(":backend:db:api")
+include(":backend:db:factory")
+include(":backend:db:postgres")
 
 // File storage abstraction
-include(":storage:api")
-include(":storage:factory")
-include(":storage:fs")
+include(":backend:storage:api")
+include(":backend:storage:factory")
+include(":backend:storage:fs")
 
 // CJE (Content/Job Engine) abstraction
-include(":cje:api")
-include(":cje:factory")
-include(":cje:local")
+include(":backend:cje:api")
+include(":backend:cje:factory")
+include(":backend:cje:local")
 
 // Publishing domain
-include(":publish:api")
-include(":publish:factory")
-include(":publish:impl")
+include(":backend:publish:api")
+include(":backend:publish:factory")
+include(":backend:publish:impl")
 
 // Discovery domain
-include(":discovery:api")
-include(":discovery:factory")
-include(":discovery:impl")
+include(":backend:discovery:api")
+include(":backend:discovery:factory")
+include(":backend:discovery:impl")
 
 // Search abstraction
-include(":search:api")
-include(":search:factory")
-include(":search:lucene")
+include(":backend:search:api")
+include(":backend:search:factory")
+include(":backend:search:lucene")
 
 // Web REST layer
-include(":web:api")
-include(":web:impl")
+include(":backend:web:api")
+include(":web:service")
 
 // Assembled Spring Boot application
 include(":app")

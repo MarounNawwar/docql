@@ -20,28 +20,28 @@ See `.github/docs/vision.md` for the full problem statement and long-term ambiti
 ## Module Map
 
 ```
-:core:api          — Immutable domain records (DocFile, DocPackage, PublishRequest, SearchResult). No dependencies.
-:db:api            — Repository interfaces (DocPackageRepository, DocFileRepository).
-:db:factory        — DbFactory interface for DB backend selection.
-:db:postgres       — JPA-backed Postgres implementation (current placeholder uses in-memory store).
-:storage:api       — StorageBackend interface (store/retrieve/list/delete blobs).
-:storage:factory   — StorageFactory interface.
-:storage:fs        — Filesystem implementation of StorageBackend.
-:cje:api           — CjeEngine + CjeJob + CjeJobResult + CjeJobStatus. Content/Job Engine abstraction.
-:cje:factory       — CjeFactory interface.
-:cje:local         — In-process synchronous CjeEngine; INDEX_PACKAGE handler must call SearchEngine.
-:publish:api       — PublishService interface (publish, retract).
-:publish:factory   — PublishFactory interface.
-:publish:impl      — DefaultPublishService: validate → store blobs → persist metadata → submit CJE job.
-:discovery:api     — DiscoveryService interface (list, find, readFile).
-:discovery:factory — DiscoveryFactory interface.
-:discovery:impl    — DefaultDiscoveryService backed by db repositories.
-:search:api        — SearchEngine interface (index, deindex, search).
-:search:factory    — SearchFactory interface.
-:search:lucene     — Apache Lucene implementation (currently in-memory; needs FSDirectory for persistence).
-:web:api           — DTOs (DocFileDto, DocPackageDto, PublishRequestDto, SearchResultDto).
-:web:impl          — Spring REST controllers (PublishController, DiscoveryController, SearchController) + MapStruct WebMapper.
-:app               — Spring Boot entry point. DocqlConfig wires all factory beans. The only place that knows about concrete implementations.
+:backend:core:api          — Immutable domain records (DocFile, DocPackage, PublishRequest, SearchResult). No dependencies.
+:backend:db:api            — Repository interfaces (DocPackageRepository, DocFileRepository).
+:backend:db:factory        — DbFactory interface for DB backend selection.
+:backend:db:postgres       — JPA-backed Postgres implementation + property-driven Spring config.
+:backend:storage:api       — StorageBackend interface (store/retrieve/list/delete blobs).
+:backend:storage:factory   — StorageFactory interface.
+:backend:storage:fs        — Filesystem implementation + property-driven Spring config.
+:backend:cje:api           — CjeEngine + CjeJob + CjeJobResult + CjeJobStatus. Content/Job Engine abstraction.
+:backend:cje:factory       — CjeFactory interface.
+:backend:cje:local         — In-process synchronous CjeEngine + property-driven Spring config.
+:backend:publish:api       — PublishService interface (publish, retract).
+:backend:publish:factory   — PublishFactory interface.
+:backend:publish:impl      — DefaultPublishService + property-driven Spring config.
+:backend:discovery:api     — DiscoveryService interface (list, find, readFile).
+:backend:discovery:factory — DiscoveryFactory interface.
+:backend:discovery:impl    — DefaultDiscoveryService + property-driven Spring config.
+:backend:search:api        — SearchEngine interface (index, deindex, search).
+:backend:search:factory    — SearchFactory interface.
+:backend:search:lucene     — Apache Lucene implementation + property-driven Spring config.
+:backend:web:api           — DTOs (DocFileDto, DocPackageDto, PublishRequestDto, SearchResultDto).
+:web:service               — Spring REST controllers (PublishController, DiscoveryController, SearchController) + MapStruct WebMapper.
+:app                       — Spring Boot entry point.
 ```
 
 ---
@@ -49,11 +49,11 @@ See `.github/docs/vision.md` for the full problem statement and long-term ambiti
 ## Key Design Rules — Always Follow These
 
 ### Architecture
-- **Domain modules are framework-free.** `:core:api`, `:db:api`, `:storage:api`, `:cje:api`, `:publish:api`, `:discovery:api`, `:search:api` must never import Spring, JPA, or any framework annotation. They are plain Java 21.
-- **Spring annotations live only in `:web:impl` and `:app`.** Service implementations (`:publish:impl`, `:discovery:impl`, etc.) are plain Java classes wired by the `DocqlConfig` `@Configuration` class.
-- **All wiring is in `DocqlConfig`.** No `@Service` / `@Component` auto-scan on domain beans. Constructor injection only.
-- **The factory pattern is the extension seam.** To swap a backend (e.g. filesystem → S3, local CJE → Jenkins), create a new factory class and change one `@Bean` method in `DocqlConfig`. No other files should need to change.
-- **`api` modules define contracts. `factory` modules define selection interfaces. Named-backend modules (`postgres`, `fs`, `lucene`, `local`) are concrete implementations.** Never add a concrete implementation directly to an `api` module.
+- **Framework-free contracts stay pure Java.** `:backend:core:api`, `:backend:db:api`, `:backend:storage:api`, `:backend:cje:api`, `:backend:publish:api`, `:backend:discovery:api`, `:backend:search:api` must never import Spring or JPA.
+- **Spring entrypoints live at module edges.** Controllers are in `:web:service`; backend implementations may expose Spring `@Configuration` classes to register beans.
+- **Wiring is distributed by module and selected by property.** Each implementation module owns its own conditional config (`@ConditionalOnProperty`) so backends can be swapped via `application.yml`.
+- **The factory pattern remains the extension seam.** New implementations provide a factory + conditional config class; existing callers continue to depend on interfaces.
+- **`api` modules define contracts. `factory` modules define selection interfaces. Named-backend modules (`postgres`, `fs`, `lucene`, `local`) are concrete implementations.** Never add concrete implementations directly to an `api` module.
 
 ### Testing
 - **Always propose tests alongside every implementation.** Every new class or method must have a corresponding test class.
@@ -71,12 +71,12 @@ See `.github/docs/vision.md` for the full problem statement and long-term ambiti
 - Conventional commits: `feat:`, `fix:`, `test:`, `refactor:`, `docs:`, `chore:`.
 
 ### Adding a New Backend (e.g., S3 storage)
-1. Create a new sub-module under the relevant domain (e.g., `:storage:s3`).
+1. Create a new sub-module under the relevant domain (e.g., `:backend:storage:s3`).
 2. Implement the `api` interface (`StorageBackend`).
 3. Create a factory class implementing the `factory` interface (`StorageFactory`).
-4. Register the module in `settings.gradle.kts`.
-5. Add the dependency in `app/build.gradle.kts`.
-6. Swap the `@Bean` in `DocqlConfig`. Done.
+4. Add a Spring `@Configuration` class in that module and guard it with `@ConditionalOnProperty`.
+5. Register the module in `settings.gradle.kts` and depend on it from `app/build.gradle.kts`.
+6. Set `docql.storage.impl=s3` (or env var equivalent). Done.
 
 ---
 

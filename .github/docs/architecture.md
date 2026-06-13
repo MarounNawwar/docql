@@ -5,7 +5,7 @@
 docql is built around three principles:
 
 1. **Ports and adaptors.** Every external dependency (database, storage, search engine, job engine) is hidden behind a plain Java interface in an `api` module. Concrete implementations are swappable by changing a single factory call.
-2. **Framework at the edges.** Spring Boot lives only in `:web:impl` (controllers, DTOs) and `:app` (wiring). Domain logic, service logic, and repository contracts are plain Java — no Spring annotations, no JPA in domain classes.
+2. **Framework at the edges.** Spring Boot lives in `:web:service`, `:app`, and backend implementation modules that expose conditional `@Configuration` classes. Domain contracts stay plain Java.
 3. **Distributed ownership, centralised query.** Each team pushes their own docs; the registry aggregates them. The system is designed to scale horizontally by team count, not by central editorial effort.
 
 ---
@@ -19,26 +19,28 @@ docql is built around three principles:
           └──────────────────┬─────────────────────────────────┘
                              │ depends on all modules below
           ┌──────────────────▼─────────────────────────────────┐
-          │                  :web:impl                          │
+          │                :web:service                         │
           │  (REST controllers, MapStruct WebMapper)            │
-          │  depends on → :web:api, :publish:api, :discovery:api│
-          │               :search:api                          │
+          │  depends on → :backend:web:api                      │
+          │               :backend:publish:api                  │
+          │               :backend:discovery:api                │
+          │               :backend:search:api                   │
           └──────────────────┬─────────────────────────────────┘
                              │
    ┌─────────────────────────┼──────────────────────────┐
    │                         │                          │
-:publish:impl          :discovery:impl            :search:lucene
+:backend:publish:impl  :backend:discovery:impl    :backend:search:lucene
    │                         │                          │
-:publish:api           :discovery:api             :search:api ─── :search:factory
-:publish:factory       :discovery:factory              │
-   │                         │                     :core:api
+:backend:publish:api   :backend:discovery:api     :backend:search:api ─── :backend:search:factory
+:backend:publish:factory :backend:discovery:factory      │
+   │                         │                     :backend:core:api
    └────────────┬────────────┘
                 │ all service impls depend on:
         ┌───────┴────────┬──────────────┬──────────────┐
-   :db:api          :storage:api    :cje:api        :core:api
-   :db:factory      :storage:factory :cje:factory
+   :backend:db:api  :backend:storage:api :backend:cje:api :backend:core:api
+   :backend:db:factory :backend:storage:factory :backend:cje:factory
         │                │               │
-   :db:postgres    :storage:fs      :cje:local
+   :backend:db:postgres :backend:storage:fs :backend:cje:local
 ```
 
 > **Rule**: arrows point downward only. No upward or horizontal dependencies between modules at the same layer.
@@ -56,10 +58,10 @@ Client (CI/CD or manual)
 POST /packages
         │
         ▼
-PublishController (web:impl)
+PublishController (web:service)
         │  maps DTO → PublishRequest via WebMapper
         ▼
-PublishService.publish(request) (publish:impl)
+PublishService.publish(request) (backend:publish:impl)
         │
         ├─ 1. validate(request)       — IllegalArgumentException on missing fields
         ├─ 2. Assign packageId        — UUID
@@ -69,14 +71,14 @@ PublishService.publish(request) (publish:impl)
         └─ 6. CjeEngine.submit(INDEX_PACKAGE job)
                   │
                   ▼
-           LocalCjeEngine (cje:local)
+           LocalCjeEngine (backend:cje:local)
                   │  INDEX_PACKAGE handler:
                   ├─ load DocPackage from DocPackageRepository
                   ├─ load DocFiles from DocFileRepository
                   └─ SearchEngine.index(file, team, product, version) for each file
                              │
                              ▼
-                      LuceneSearchEngine (search:lucene)
+                      LuceneSearchEngine (backend:search:lucene)
                              — writes to Lucene index (FSDirectory)
 ```
 
@@ -95,13 +97,13 @@ GET /packages/{team}/{product}/{version}/files — list files
 GET /packages/{team}/{product}/{version}/files/{path} — read file
         │
         ▼
-DiscoveryController (web:impl)
+DiscoveryController (web:service)
         │
         ▼
-DiscoveryService (discovery:impl)
+DiscoveryService (backend:discovery:impl)
         │
         ▼
-DocPackageRepository / DocFileRepository (db:postgres)
+DocPackageRepository / DocFileRepository (backend:db:postgres)
 ```
 
 ### Search Flow (Full-text)
@@ -113,10 +115,10 @@ Client (AI agent or human)
 GET /search?q={query}&team={team}&tags={tags}
         │
         ▼
-SearchController (web:impl)
+SearchController (web:service)
         │
         ▼
-SearchEngine.search(query, tags, team) (search:lucene)
+SearchEngine.search(query, tags, team) (backend:search:lucene)
         │  Lucene MultiFieldQueryParser over title + content fields
         │  Optional BooleanQuery filter on team field
         ▼
@@ -132,7 +134,7 @@ Client
 DELETE /packages/{team}/{product}/{version}
         │
         ▼
-PublishService.retract(team, product, version) (publish:impl)
+PublishService.retract(team, product, version) (backend:publish:impl)
         ├─ DocFileRepository.deleteByPackageId()
         ├─ StorageBackend.deleteByPrefix()
         ├─ DocPackageRepository.deleteById()
@@ -153,12 +155,12 @@ Every external concern is hidden behind an interface. To replace a backend:
 | Search | `SearchEngine` | `LuceneSearchEngine` (in-memory) | Lucene FSDirectory, Elasticsearch, OpenSearch |
 
 Steps to swap (example: replace FS storage with S3):
-1. Add `:storage:s3` module with `S3StorageBackend implements StorageBackend`.
+1. Add `:backend:storage:s3` module with `S3StorageBackend implements StorageBackend`.
 2. Add `S3StorageFactory implements StorageFactory`.
-3. Register in `settings.gradle.kts`.
-4. Add dependency in `app/build.gradle.kts`.
-5. Change `storageBackend()` `@Bean` in `DocqlConfig` to use `new S3StorageFactory(...)`.
-6. No other files change.
+3. Add module-local Spring config guarded by `@ConditionalOnProperty(prefix = "docql.storage", name = "impl", havingValue = "s3")`.
+4. Register in `settings.gradle.kts`.
+5. Add dependency in `app/build.gradle.kts`.
+6. Set `docql.storage.impl=s3`.
 
 ---
 
@@ -197,7 +199,7 @@ Kubernetes deployment with:
 ## Key Constraints
 
 - `:core:api` has zero dependencies. It is the foundation everything else depends on.
-- `DocqlConfig` is the **only** class that may reference concrete implementation classes (e.g., `PostgresDbFactory`, `LuceneSearchFactory`). Controllers and service classes see only interfaces.
+- Controllers and service classes see only interfaces. Concrete implementation selection is done by module-local Spring configuration classes guarded by `docql.*.impl` properties.
 - The `CjeEngine` intentionally decouples publishing from indexing. Publishing returns immediately after persisting. Indexing happens in the CJE handler. This allows future async execution without changing the publish contract.
 - All domain identifiers (`packageId`) are UUIDs generated server-side. Clients never assign IDs.
 - Storage keys follow the pattern `{team}/{product}/{version}/{relativePath}`.

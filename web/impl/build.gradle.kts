@@ -3,10 +3,10 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":core:api"))
-    implementation(project(":web:api"))
-    implementation(project(":publish:api"))
-    implementation(project(":discovery:api"))
-    implementation(project(":search:api"))
+    implementation(project(":backend:core:api"))
+    implementation(project(":backend:web:api"))
+    implementation(project(":backend:publish:api"))
+    implementation(project(":backend:discovery:api"))
+    implementation(project(":backend:search:api"))
     implementation("org.springframework.boot:spring-boot-starter-web")
 }

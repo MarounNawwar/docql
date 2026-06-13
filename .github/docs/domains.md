@@ -2,9 +2,11 @@
 
 Each domain in docql is a bounded context with its own `api` (contract), `factory` (selection), and named implementation module(s). This file documents each domain's purpose, key interfaces, current implementation state, and known extension points.
 
+All backend modules are now grouped under the `:backend:*` namespace (for example, `:backend:db:api`, `:backend:search:lucene`).
+
 ---
 
-## `:core:api` — Shared Domain Model
+## `:backend:core:api` — Shared Domain Model
 
 **Purpose**: Defines the immutable data records shared across all domains. Has no dependencies on any other module, framework, or library.
 
@@ -25,7 +27,7 @@ Each domain in docql is a bounded context with its own `api` (contract), `factor
 
 ---
 
-## `:db:api` — Repository Contracts
+## `:backend:db:api` — Repository Contracts
 
 **Purpose**: Defines the persistence interfaces used by service layers. Hides all database details behind simple Java interfaces.
 
@@ -57,7 +59,7 @@ deleteByPackageId(String packageId)                       → void
 
 ---
 
-## `:db:factory` — DB Backend Selection
+## `:backend:db:factory` — DB Backend Selection
 
 **Purpose**: Defines `DbFactory`, the interface that produces both repository instances.
 
@@ -68,11 +70,11 @@ public interface DbFactory {
 }
 ```
 
-`DocqlConfig` calls the factory once per application startup. The factory encapsulates all wiring of the underlying persistence layer.
+Module-local Spring configuration calls the factory when the backend is selected by property. The factory encapsulates all wiring of the underlying persistence layer.
 
 ---
 
-## `:db:postgres` — JPA/Postgres Implementation
+## `:backend:db:postgres` — JPA/Postgres Implementation
 
 **Purpose**: Concrete implementation of `DocPackageRepository` and `DocFileRepository` backed by Postgres via Spring Data JPA.
 
@@ -82,14 +84,14 @@ public interface DbFactory {
 - Spring Data JPA `@Entity` classes for `DocPackage` and `DocFile`.
 - Spring Data `JpaRepository`-backed implementations.
 - Flyway migrations for schema management.
-- `PostgresDbFactory` receives a `DataSource` (or EntityManagerFactory) via constructor injection from `DocqlConfig`.
+- `PostgresDbFactory` is exposed through `PostgresDbConfiguration`, enabled when `docql.db.impl=postgres`.
 
 **Extension points**:
-- To add a new DB backend (e.g., MySQL, MongoDB), create a new module (e.g., `:db:mongodb`), implement both repository interfaces, create a factory, and swap the `@Bean` in `DocqlConfig`.
+- To add a new DB backend (e.g., MySQL, MongoDB), create a new module (e.g., `:backend:db:mongodb`), implement both repository interfaces, create a factory, and add a `@ConditionalOnProperty` configuration for selection.
 
 ---
 
-## `:storage:api` — Storage Contract
+## `:backend:storage:api` — Storage Contract
 
 **Purpose**: Defines `StorageBackend`, the interface for binary blob storage.
 
@@ -107,7 +109,7 @@ Keys follow the pattern: `{team}/{product}/{version}/{relativePath}`.
 
 ---
 
-## `:storage:factory` — Storage Backend Selection
+## `:backend:storage:factory` — Storage Backend Selection
 
 Defines `StorageFactory`:
 ```java
@@ -118,22 +120,22 @@ public interface StorageFactory {
 
 ---
 
-## `:storage:fs` — Filesystem Implementation
+## `:backend:storage:fs` — Filesystem Implementation
 
 **Purpose**: Stores and retrieves blobs as plain files on a local filesystem path.
 
 **Current state**: Functional. The root path is configurable via `docql.storage.root` (defaults to `docql-storage`). Used for local development and Docker Compose.
 
 **Extension points**:
-- `:storage:s3` — S3/MinIO backed implementation.
-- `:storage:nexus` — Nexus raw repository backed implementation.
-- `:storage:azure` — Azure Blob Storage implementation.
+- `:backend:storage:s3` — S3/MinIO backed implementation.
+- `:backend:storage:nexus` — Nexus raw repository backed implementation.
+- `:backend:storage:azure` — Azure Blob Storage implementation.
 
-All of the above follow the same pattern: implement `StorageBackend`, create a `StorageFactory`, register in `settings.gradle.kts`, add to `app/build.gradle.kts`, swap the `@Bean`.
+All of the above follow the same pattern: implement `StorageBackend`, create a `StorageFactory`, register in `settings.gradle.kts`, add to `app/build.gradle.kts`, and select via `docql.storage.impl`.
 
 ---
 
-## `:cje:api` — Content/Job Engine Contract
+## `:backend:cje:api` — Content/Job Engine Contract
 
 **Purpose**: Defines the abstraction over a content processing and job execution engine. Decouples the act of publishing from the act of indexing.
 
@@ -157,7 +159,7 @@ All of the above follow the same pattern: implement `StorageBackend`, create a `
 
 ---
 
-## `:cje:factory` — CJE Backend Selection
+## `:backend:cje:factory` — CJE Backend Selection
 
 Defines `CjeFactory`:
 ```java
@@ -168,7 +170,7 @@ public interface CjeFactory {
 
 ---
 
-## `:cje:local` — In-Process CJE Implementation
+## `:backend:cje:local` — In-Process CJE Implementation
 
 **Purpose**: Runs jobs synchronously in the same JVM process. Designed for local development and early PoC.
 
@@ -180,13 +182,13 @@ public interface CjeFactory {
 3. Call `searchEngine.index(file, team, product, version)` for each file.
 
 **Extension points**:
-- `:cje:jenkins` — Submit jobs to a Jenkins pipeline via HTTP API.
-- `:cje:github-actions` — Trigger a GitHub Actions workflow dispatch event.
-- `:cje:async` — Dispatch jobs to an internal thread pool or message queue (Kafka, RabbitMQ) before returning.
+- `:backend:cje:jenkins` — Submit jobs to a Jenkins pipeline via HTTP API.
+- `:backend:cje:github-actions` — Trigger a GitHub Actions workflow dispatch event.
+- `:backend:cje:async` — Dispatch jobs to an internal thread pool or message queue (Kafka, RabbitMQ) before returning.
 
 ---
 
-## `:publish:api` — Publish Contract
+## `:backend:publish:api` — Publish Contract
 
 **Purpose**: Defines the single entry point for teams to push documentation.
 
@@ -202,7 +204,7 @@ public interface PublishService {
 
 ---
 
-## `:publish:factory` + `:publish:impl`
+## `:backend:publish:factory` + `:backend:publish:impl`
 
 **`DefaultPublishService`** is the only implementation. No alternative publish flow is anticipated — the extension seam here is at the collaborator level (swap the DB, storage, or CJE backends, not the publish service itself).
 
@@ -217,7 +219,7 @@ public interface PublishService {
 
 ---
 
-## `:discovery:api` — Discovery Contract
+## `:backend:discovery:api` — Discovery Contract
 
 **Purpose**: Read-only browsing of the registry. Answers the questions: what exists? what is the latest version? what does this file say?
 
@@ -236,13 +238,13 @@ listFiles(String team, String product, String version)  → List<DocFile>
 
 ---
 
-## `:discovery:factory` + `:discovery:impl`
+## `:backend:discovery:factory` + `:backend:discovery:impl`
 
 **`DefaultDiscoveryService`** delegates to `DocPackageRepository` and `DocFileRepository`. There is no alternative implementation planned — the extension seam is the DB backend.
 
 ---
 
-## `:search:api` — Search Contract
+## `:backend:search:api` — Search Contract
 
 **Purpose**: Full-text search across all indexed documentation.
 
@@ -275,7 +277,7 @@ public interface SearchEngine {
 
 ---
 
-## `:search:factory` + `:search:lucene`
+## `:backend:search:factory` + `:backend:search:lucene`
 
 **`LuceneSearchEngine`** uses Apache Lucene 9.10 with a `StandardAnalyzer` and `MultiFieldQueryParser` across `title` and `content`.
 
@@ -289,7 +291,7 @@ public interface SearchEngine {
 
 ---
 
-## `:web:api` — REST DTOs
+## `:backend:web:api` — REST DTOs
 
 **Purpose**: Data Transfer Objects used by the REST layer. Kept separate from domain records so that the API contract can evolve independently of the domain model.
 
@@ -302,7 +304,7 @@ public interface SearchEngine {
 
 ---
 
-## `:web:impl` — REST Controllers
+## `:web:service` — REST Controllers
 
 **Purpose**: Spring MVC controllers and MapStruct mapper. The only module that may carry `@RestController`, `@RequestMapping`, `@RequestBody`, etc.
 
@@ -318,12 +320,12 @@ public interface SearchEngine {
 
 ## `:app` — Spring Boot Application
 
-**Purpose**: The assembled runnable application. The **only** module that may import concrete implementation classes (e.g., `PostgresDbFactory`, `LuceneSearchFactory`).
+**Purpose**: The assembled runnable application and runtime composition root.
 
-**`DocqlConfig`** is the single `@Configuration` class. Every service bean is constructed via its factory. No `@ComponentScan` of domain packages. Constructor injection throughout.
+`DocqlApplication` component-scan discovers module-local `@Configuration` classes. `DocqlConfig` remains a minimal root config class.
 
 When adding any new backend or service:
-1. Add the dependency to `app/build.gradle.kts`.
-2. Add a `@Bean` method to `DocqlConfig` that instantiates the factory and calls the appropriate factory method.
-3. No other file in `:app` should change.
+1. Add the implementation module dependency to `app/build.gradle.kts`.
+2. Add/update the module-local `@Configuration` class with `@ConditionalOnProperty`.
+3. Set the corresponding `docql.<domain>.impl` property.
 
