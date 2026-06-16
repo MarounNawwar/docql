@@ -51,7 +51,7 @@ class DiscoveryControllerTest {
         when(webMapper.toDocPackageDto(pkg("p1"))).thenReturn(dto("p1"));
         when(webMapper.toDocPackageDto(pkg("p2"))).thenReturn(dto("p2"));
 
-        List<DocPackageDto> result = controller.list(null, null);
+        List<DocPackageDto> result = controller.listPackages(null, null);
 
         assertThat(result).hasSize(2);
         verify(discoveryService).listAll();
@@ -64,7 +64,7 @@ class DiscoveryControllerTest {
         when(discoveryService.listByTeam("eng")).thenReturn(List.of(pkg("p1")));
         when(webMapper.toDocPackageDto(pkg("p1"))).thenReturn(dto("p1"));
 
-        List<DocPackageDto> result = controller.list("eng", null);
+        List<DocPackageDto> result = controller.listPackages("eng", null);
 
         assertThat(result).hasSize(1);
         verify(discoveryService).listByTeam("eng");
@@ -75,7 +75,7 @@ class DiscoveryControllerTest {
         when(discoveryService.listByTag("api")).thenReturn(List.of(pkg("p1")));
         when(webMapper.toDocPackageDto(pkg("p1"))).thenReturn(dto("p1"));
 
-        List<DocPackageDto> result = controller.list(null, "api");
+        List<DocPackageDto> result = controller.listPackages(null, "api");
 
         assertThat(result).hasSize(1);
         verify(discoveryService).listByTag("api");
@@ -88,7 +88,7 @@ class DiscoveryControllerTest {
 
         DocPackageDto result = controller.findLatest("eng", "docs");
 
-        assertThat(result.id()).isEqualTo("p1");
+        assertThat(result.getId()).isEqualTo("p1");
     }
 
     @Test
@@ -106,7 +106,7 @@ class DiscoveryControllerTest {
 
         DocPackageDto result = controller.findVersion("eng", "docs", "1.0.0");
 
-        assertThat(result.version()).isEqualTo("1.0.0");
+        assertThat(result.getVersion()).isEqualTo("1.0.0");
     }
 
     @Test
@@ -127,7 +127,7 @@ class DiscoveryControllerTest {
         List<DocFileDto> result = controller.listFiles("eng", "docs", "1.0.0");
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).path()).isEqualTo("README.md");
+        assertThat(result.get(0).getPath()).isEqualTo("README.md");
     }
 
     @Test
@@ -139,8 +139,8 @@ class DiscoveryControllerTest {
 
         DocFileDto result = controller.readIndex("eng", "docs", "1.0.0");
 
-        assertThat(result.path()).isEqualTo("index.md");
-        assertThat(result.content()).isEqualTo("# Index");
+        assertThat(result.getPath()).isEqualTo("index.md");
+        assertThat(result.getContent()).isEqualTo("# Index");
     }
 
     @Test
@@ -160,7 +160,7 @@ class DiscoveryControllerTest {
 
         DocFileDto result = controller.readFile("eng", "docs", "1.0.0", "guide.md");
 
-        assertThat(result.path()).isEqualTo("guide.md");
+        assertThat(result.getPath()).isEqualTo("guide.md");
     }
 
     @Test

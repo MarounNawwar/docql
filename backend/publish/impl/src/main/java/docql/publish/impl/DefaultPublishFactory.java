@@ -1,8 +1,8 @@
 package docql.publish.impl;
 
-import docql.cje.CjeEngine;
-import docql.db.DocFileRepository;
-import docql.db.DocPackageRepository;
+import docql.job.CjeEngine;
+import docql.persistence.DocFileRepository;
+import docql.persistence.DocPackageRepository;
 import docql.publish.PublishFactory;
 import docql.publish.PublishService;
 import docql.storage.StorageBackend;

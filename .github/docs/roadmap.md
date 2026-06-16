@@ -1,4 +1,4 @@
-# Roadmap — docql
+﻿# Roadmap — docql
 
 ## Guiding Principle
 
@@ -94,7 +94,7 @@ The system can support larger deployments, pluggable storage, and external searc
 | Async CJE | `INDEX_PACKAGE` dispatched to a thread pool or message queue rather than blocking the request thread. |
 | Kubernetes manifests | `k8s/` folder with Deployment, Service, ConfigMap, Secret, Ingress resources. |
 | Multi-version diff | `GET /packages/{team}/{product}/{v1}/diff/{v2}` — returns a structured diff between two package versions. |
-| Jenkins / GitHub Actions CJE | `:cje:jenkins` and/or `:cje:github-actions` modules. Triggered after publish, result reported async. |
+| Jenkins / GitHub Actions CJE | `:job:jenkins` and/or `:job:github-actions` modules. Triggered after publish, result reported async. |
 
 ---
 

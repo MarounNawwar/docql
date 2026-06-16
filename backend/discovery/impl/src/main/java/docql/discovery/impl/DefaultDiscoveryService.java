@@ -2,8 +2,8 @@ package docql.discovery.impl;
 
 import docql.core.DocFile;
 import docql.core.DocPackage;
-import docql.db.DocFileRepository;
-import docql.db.DocPackageRepository;
+import docql.persistence.DocFileRepository;
+import docql.persistence.DocPackageRepository;
 import docql.discovery.DiscoveryService;
 
 import java.util.List;

@@ -16,10 +16,10 @@ spring:
     locations: classpath:db/migration
 
 docql:
-  db:
-    impl: ${DOCQL_DB_IMPL:postgres}
-  cje:
-    impl: ${DOCQL_CJE_IMPL:local}
+  persistence:
+    impl: ${DOCQL_PERSISTENCE_IMPL:postgres}
+  job:
+    impl: ${DOCQL_JOB_IMPL:local}
   publish:
     impl: ${DOCQL_PUBLISH_IMPL:default}
   discovery:

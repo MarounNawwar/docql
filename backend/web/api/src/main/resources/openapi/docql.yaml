@@ -1,0 +1,288 @@
+openapi: 3.0.3
+info:
+  title: docql API
+  version: 1.0.0
+  description: API contract for publish, discovery, and search endpoints.
+servers:
+  - url: /
+paths:
+  /packages:
+    post:
+      tags: [Publish]
+      operationId: publish
+      summary: Publish a documentation package
+      description: Stores all files, persists metadata, and triggers indexing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublishRequestDto'
+      responses:
+        '201':
+          description: Package published successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocPackageDto'
+        '400':
+          description: Invalid publish request
+    get:
+      tags: [Discovery]
+      operationId: listPackages
+      summary: List packages
+      description: Returns all packages, optionally filtered by team or tag.
+      parameters:
+        - in: query
+          name: team
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: tag
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Package list returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DocPackageDto'
+  /packages/{team}/{product}:
+    get:
+      tags: [Discovery]
+      operationId: findLatest
+      summary: Get latest version of a product
+      parameters:
+        - $ref: '#/components/parameters/TeamParam'
+        - $ref: '#/components/parameters/ProductParam'
+      responses:
+        '200':
+          description: Package metadata returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocPackageDto'
+        '404':
+          description: Product not found
+  /packages/{team}/{product}/{version}:
+    get:
+      tags: [Discovery]
+      operationId: findVersion
+      summary: Get a specific version of a product
+      parameters:
+        - $ref: '#/components/parameters/TeamParam'
+        - $ref: '#/components/parameters/ProductParam'
+        - $ref: '#/components/parameters/VersionParam'
+      responses:
+        '200':
+          description: Package metadata returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocPackageDto'
+        '404':
+          description: Version not found
+    delete:
+      tags: [Publish]
+      operationId: retract
+      summary: Retract a documentation package version
+      description: Removes stored files, records, and index entries for the version.
+      parameters:
+        - $ref: '#/components/parameters/TeamParam'
+        - $ref: '#/components/parameters/ProductParam'
+        - $ref: '#/components/parameters/VersionParam'
+      responses:
+        '204':
+          description: Package retracted successfully
+        '404':
+          description: Package not found
+  /packages/{team}/{product}/{version}/files:
+    get:
+      tags: [Discovery]
+      operationId: listFiles
+      summary: List all files in a package version
+      parameters:
+        - $ref: '#/components/parameters/TeamParam'
+        - $ref: '#/components/parameters/ProductParam'
+        - $ref: '#/components/parameters/VersionParam'
+      responses:
+        '200':
+          description: File list returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DocFileDto'
+        '404':
+          description: Version not found
+  /packages/{team}/{product}/{version}/index:
+    get:
+      tags: [Discovery]
+      operationId: readIndex
+      summary: Read the index file of a package version
+      parameters:
+        - $ref: '#/components/parameters/TeamParam'
+        - $ref: '#/components/parameters/ProductParam'
+        - $ref: '#/components/parameters/VersionParam'
+      responses:
+        '200':
+          description: Index file content returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocFileDto'
+        '404':
+          description: Version or index file not found
+  /packages/{team}/{product}/{version}/files/{filePath}:
+    get:
+      tags: [Discovery]
+      operationId: readFile
+      summary: Read a specific file from a package version
+      parameters:
+        - $ref: '#/components/parameters/TeamParam'
+        - $ref: '#/components/parameters/ProductParam'
+        - $ref: '#/components/parameters/VersionParam'
+        - in: path
+          name: filePath
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: File content returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocFileDto'
+        '404':
+          description: File not found
+  /search:
+    get:
+      tags: [Search]
+      operationId: search
+      summary: Search documentation
+      description: Full-text search over title and content fields with optional team and tag filtering.
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: team
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: tags
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Ranked list of matching documents returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchResultDto'
+components:
+  parameters:
+    TeamParam:
+      in: path
+      name: team
+      required: true
+      schema:
+        type: string
+    ProductParam:
+      in: path
+      name: product
+      required: true
+      schema:
+        type: string
+    VersionParam:
+      in: path
+      name: version
+      required: true
+      schema:
+        type: string
+  schemas:
+    DocFileDto:
+      type: object
+      required: [path, title, content]
+      properties:
+        path:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+    PublishRequestDto:
+      type: object
+      required: [team, product, version, tags, indexFilePath, files]
+      properties:
+        team:
+          type: string
+        product:
+          type: string
+        version:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        indexFilePath:
+          type: string
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocFileDto'
+    DocPackageDto:
+      type: object
+      required: [id, team, product, version, tags, publishedAt, indexFilePath]
+      properties:
+        id:
+          type: string
+        team:
+          type: string
+        product:
+          type: string
+        version:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        publishedAt:
+          type: string
+          format: date-time
+        indexFilePath:
+          type: string
+    SearchResultDto:
+      type: object
+      required: [packageId, team, product, version, filePath, title, snippet]
+      properties:
+        packageId:
+          type: string
+        team:
+          type: string
+        product:
+          type: string
+        version:
+          type: string
+        filePath:
+          type: string
+        title:
+          type: string
+        snippet:
+          type: string

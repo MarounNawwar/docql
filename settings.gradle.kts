@@ -3,20 +3,20 @@ rootProject.name = "docql"
 // Core shared domain model
 include(":backend:core:api")
 
-// Database abstraction
-include(":backend:db:api")
-include(":backend:db:factory")
-include(":backend:db:postgres")
+// Persistence abstraction
+include(":backend:persistence:api")
+include(":backend:persistence:factory")
+include(":backend:persistence:postgres")
 
 // File storage abstraction
 include(":backend:storage:api")
 include(":backend:storage:factory")
 include(":backend:storage:fs")
 
-// CJE (Content/Job Engine) abstraction
-include(":backend:cje:api")
-include(":backend:cje:factory")
-include(":backend:cje:local")
+// Job Engine (CJE) abstraction
+include(":backend:job:api")
+include(":backend:job:factory")
+include(":backend:job:local")
 
 // Publishing domain
 include(":backend:publish:api")

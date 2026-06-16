@@ -1,4 +1,4 @@
-# Conventions — docql
+﻿# Conventions — docql
 
 ## Purpose
 
@@ -23,9 +23,9 @@ This document is the authoritative reference for how code is written, structured
 | Suffix | Purpose | Example |
 |---|---|---|
 | `:api` | Contracts only — interfaces and records. Zero dependencies. | `:publish:api`, `:search:api` |
-| `:factory` | Selection interface for a backend. Produces an instance of the `api` interface. | `:db:factory`, `:cje:factory` |
+| `:factory` | Selection interface for a backend. Produces an instance of the `api` interface. | `:persistence:factory`, `:job:factory` |
 | `:impl` | Single obvious implementation with no better technology-specific name. | `:publish:impl`, `:discovery:impl` |
-| `:postgres`, `:lucene`, `:fs`, `:local` | Named-backend module. Technology is explicit. | `:db:postgres`, `:search:lucene` |
+| `:postgres`, `:lucene`, `:fs`, `:local` | Named-backend module. Technology is explicit. | `:persistence:postgres`, `:search:lucene` |
 
 **Do not** name a concrete implementation `:impl` when there is a good technology-specific name. `:storage:s3` is better than `:storage:impl`.
 
@@ -36,8 +36,8 @@ Java packages mirror the module path:
 | Module | Package |
 |---|---|
 | `:core:api` | `docql.core` |
-| `:db:api` | `docql.db` |
-| `:db:postgres` | `docql.db.postgres` |
+| `:persistence:api` | `docql.persistence` |
+| `:persistence:postgres` | `docql.persistence.postgres` |
 | `:publish:impl` | `docql.publish.impl` |
 | `:search:lucene` | `docql.search.lucene` |
 | `:web:impl` | `docql.web.controller`, `docql.web.mapper` |
@@ -52,9 +52,9 @@ Java packages mirror the module path:
 | Layer | Spring allowed? | Framework allowed? | May see concrete impls? |
 |---|---|---|---|
 | `:core:api` | ❌ | ❌ | ❌ |
-| `:db:api`, `:storage:api`, `:cje:api`, `:search:api`, `:publish:api`, `:discovery:api` | ❌ | ❌ | ❌ |
-| `:db:factory`, `:storage:factory`, `:cje:factory`, `:search:factory` | ❌ | ❌ | ❌ |
-| `:db:postgres`, `:storage:fs`, `:cje:local`, `:search:lucene` | ❌ Spring annotations | ✅ JPA, Lucene, etc. | ✅ own only |
+| `:persistence:api`, `:storage:api`, `:job:api`, `:search:api`, `:publish:api`, `:discovery:api` | ❌ | ❌ | ❌ |
+| `:persistence:factory`, `:storage:factory`, `:job:factory`, `:search:factory` | ❌ | ❌ | ❌ |
+| `:persistence:postgres`, `:storage:fs`, `:job:local`, `:search:lucene` | ❌ Spring annotations | ✅ JPA, Lucene, etc. | ✅ own only |
 | `:publish:impl`, `:discovery:impl` | ❌ | ❌ | ❌ |
 | `:web:api` | ❌ | ❌ | ❌ |
 | `:web:impl` | ✅ `@RestController`, `@RequestMapping` etc. | ✅ Jackson, MapStruct | ❌ (sees interfaces only) |

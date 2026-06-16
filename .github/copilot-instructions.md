@@ -1,4 +1,4 @@
-# Copilot Instructions — docql
+﻿# Copilot Instructions — docql
 
 > Read this file first on every session. It is the authoritative context for the docql project.
 > Deeper references live in `.github/docs/`.
@@ -20,28 +20,28 @@ See `.github/docs/vision.md` for the full problem statement and long-term ambiti
 ## Module Map
 
 ```
-:backend:core:api          — Immutable domain records (DocFile, DocPackage, PublishRequest, SearchResult). No dependencies.
-:backend:db:api            — Repository interfaces (DocPackageRepository, DocFileRepository).
-:backend:db:factory        — DbFactory interface for DB backend selection.
-:backend:db:postgres       — JPA-backed Postgres implementation + property-driven Spring config.
-:backend:storage:api       — StorageBackend interface (store/retrieve/list/delete blobs).
-:backend:storage:factory   — StorageFactory interface.
-:backend:storage:fs        — Filesystem implementation + property-driven Spring config.
-:backend:cje:api           — CjeEngine + CjeJob + CjeJobResult + CjeJobStatus. Content/Job Engine abstraction.
-:backend:cje:factory       — CjeFactory interface.
-:backend:cje:local         — In-process synchronous CjeEngine + property-driven Spring config.
-:backend:publish:api       — PublishService interface (publish, retract).
-:backend:publish:factory   — PublishFactory interface.
-:backend:publish:impl      — DefaultPublishService + property-driven Spring config.
-:backend:discovery:api     — DiscoveryService interface (list, find, readFile).
-:backend:discovery:factory — DiscoveryFactory interface.
-:backend:discovery:impl    — DefaultDiscoveryService + property-driven Spring config.
-:backend:search:api        — SearchEngine interface (index, deindex, search).
-:backend:search:factory    — SearchFactory interface.
-:backend:search:lucene     — Apache Lucene implementation + property-driven Spring config.
-:backend:web:api           — DTOs (DocFileDto, DocPackageDto, PublishRequestDto, SearchResultDto).
-:web:service               — Spring REST controllers (PublishController, DiscoveryController, SearchController) + MapStruct WebMapper.
-:app                       — Spring Boot entry point.
+:backend:core:api               — Immutable domain records (DocFile, DocPackage, PublishRequest, SearchResult). No dependencies.
+:backend:persistence:api        — Repository interfaces (DocPackageRepository, DocFileRepository).
+:backend:persistence:factory    — DbFactory interface for persistence backend selection.
+:backend:persistence:postgres   — JPA-backed Postgres implementation + property-driven Spring config.
+:backend:storage:api            — StorageBackend interface (store/retrieve/list/delete blobs).
+:backend:storage:factory        — StorageFactory interface.
+:backend:storage:fs             — Filesystem implementation + property-driven Spring config.
+:backend:job:api                — CjeEngine + CjeJob + CjeJobResult + CjeJobStatus. Job Engine abstraction.
+:backend:job:factory            — CjeFactory interface.
+:backend:job:local              — In-process synchronous CjeEngine + property-driven Spring config.
+:backend:publish:api            — PublishService interface (publish, retract).
+:backend:publish:factory        — PublishFactory interface.
+:backend:publish:impl           — DefaultPublishService + property-driven Spring config.
+:backend:discovery:api          — DiscoveryService interface (list, find, readFile).
+:backend:discovery:factory      — DiscoveryFactory interface.
+:backend:discovery:impl         — DefaultDiscoveryService + property-driven Spring config.
+:backend:search:api             — SearchEngine interface (index, deindex, search).
+:backend:search:factory         — SearchFactory interface.
+:backend:search:lucene          — Apache Lucene implementation + property-driven Spring config.
+:backend:web:api                — DTOs (DocFileDto, DocPackageDto, PublishRequestDto, SearchResultDto).
+:web:service                    — Spring REST controllers (PublishController, DiscoveryController, SearchController) + MapStruct WebMapper.
+:app                            — Spring Boot entry point.
 ```
 
 ---
@@ -49,7 +49,7 @@ See `.github/docs/vision.md` for the full problem statement and long-term ambiti
 ## Key Design Rules — Always Follow These
 
 ### Architecture
-- **Framework-free contracts stay pure Java.** `:backend:core:api`, `:backend:db:api`, `:backend:storage:api`, `:backend:cje:api`, `:backend:publish:api`, `:backend:discovery:api`, `:backend:search:api` must never import Spring or JPA.
+- **Framework-free contracts stay pure Java.** `:backend:core:api`, `:backend:persistence:api`, `:backend:storage:api`, `:backend:job:api`, `:backend:publish:api`, `:backend:discovery:api`, `:backend:search:api` must never import Spring or JPA.
 - **Spring entrypoints live at module edges.** Controllers are in `:web:service`; backend implementations may expose Spring `@Configuration` classes to register beans.
 - **Wiring is distributed by module and selected by property.** Each implementation module owns its own conditional config (`@ConditionalOnProperty`) so backends can be swapped via `application.yml`.
 - **The factory pattern remains the extension seam.** New implementations provide a factory + conditional config class; existing callers continue to depend on interfaces.

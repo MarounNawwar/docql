@@ -1,4 +1,4 @@
-# Architecture — docql
+﻿# Architecture — docql
 
 ## Design Philosophy
 
@@ -37,10 +37,10 @@ docql is built around three principles:
    └────────────┬────────────┘
                 │ all service impls depend on:
         ┌───────┴────────┬──────────────┬──────────────┐
-   :backend:db:api  :backend:storage:api :backend:cje:api :backend:core:api
-   :backend:db:factory :backend:storage:factory :backend:cje:factory
+   :backend:persistence:api  :backend:storage:api :backend:job:api :backend:core:api
+   :backend:persistence:factory :backend:storage:factory :backend:job:factory
         │                │               │
-   :backend:db:postgres :backend:storage:fs :backend:cje:local
+   :backend:persistence:postgres :backend:storage:fs :backend:job:local
 ```
 
 > **Rule**: arrows point downward only. No upward or horizontal dependencies between modules at the same layer.
@@ -71,7 +71,7 @@ PublishService.publish(request) (backend:publish:impl)
         └─ 6. CjeEngine.submit(INDEX_PACKAGE job)
                   │
                   ▼
-           LocalCjeEngine (backend:cje:local)
+           LocalCjeEngine (backend:job:local)
                   │  INDEX_PACKAGE handler:
                   ├─ load DocPackage from DocPackageRepository
                   ├─ load DocFiles from DocFileRepository
@@ -103,7 +103,7 @@ DiscoveryController (web:service)
 DiscoveryService (backend:discovery:impl)
         │
         ▼
-DocPackageRepository / DocFileRepository (backend:db:postgres)
+DocPackageRepository / DocFileRepository (backend:persistence:postgres)
 ```
 
 ### Search Flow (Full-text)

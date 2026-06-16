@@ -1,7 +1,7 @@
 package docql.discovery.impl;
 
-import docql.db.DocFileRepository;
-import docql.db.DocPackageRepository;
+import docql.persistence.DocFileRepository;
+import docql.persistence.DocPackageRepository;
 import docql.discovery.DiscoveryService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;

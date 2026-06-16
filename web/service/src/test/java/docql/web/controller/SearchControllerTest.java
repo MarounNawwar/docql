@@ -42,7 +42,7 @@ class SearchControllerTest {
         List<SearchResultDto> response = controller.search("query", "eng", List.of());
 
         assertThat(response).hasSize(1);
-        assertThat(response.get(0).packageId()).isEqualTo("p1");
+        assertThat(response.get(0).getPackageId()).isEqualTo("p1");
         verify(searchEngine).search("query", List.of(), "eng");
     }
 
@@ -54,5 +54,15 @@ class SearchControllerTest {
 
         assertThat(response).isEmpty();
         verify(searchEngine).search("query", List.of(), null);
+    }
+
+    @Test
+    void search_nullTags_usesEmptyTagFilter() {
+        when(searchEngine.search("query", List.of(), "eng")).thenReturn(List.of());
+
+        List<SearchResultDto> response = controller.search("query", "eng", null);
+
+        assertThat(response).isEmpty();
+        verify(searchEngine).search("query", List.of(), "eng");
     }
 }

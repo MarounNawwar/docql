@@ -48,7 +48,7 @@ class PublishControllerTest {
 
         DocPackageDto result = controller.publish(requestDto);
 
-        assertThat(result.id()).isEqualTo("p1");
+        assertThat(result.getId()).isEqualTo("p1");
         verify(publishService).publish(domainRequest);
     }
 

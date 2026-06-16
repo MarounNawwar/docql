@@ -40,3 +40,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### docql local dev config ###
+app/src/main/resources/application-development.yml

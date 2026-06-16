@@ -1,8 +1,8 @@
-# Domain Reference — docql
+﻿# Domain Reference — docql
 
 Each domain in docql is a bounded context with its own `api` (contract), `factory` (selection), and named implementation module(s). This file documents each domain's purpose, key interfaces, current implementation state, and known extension points.
 
-All backend modules are now grouped under the `:backend:*` namespace (for example, `:backend:db:api`, `:backend:search:lucene`).
+All backend modules are now grouped under the `:backend:*` namespace (for example, `:backend:persistence:api`, `:backend:search:lucene`).
 
 ---
 
@@ -27,7 +27,7 @@ All backend modules are now grouped under the `:backend:*` namespace (for exampl
 
 ---
 
-## `:backend:db:api` — Repository Contracts
+## `:backend:persistence:api` — Repository Contracts
 
 **Purpose**: Defines the persistence interfaces used by service layers. Hides all database details behind simple Java interfaces.
 
@@ -59,7 +59,7 @@ deleteByPackageId(String packageId)                       → void
 
 ---
 
-## `:backend:db:factory` — DB Backend Selection
+## `:backend:persistence:factory` — DB Backend Selection
 
 **Purpose**: Defines `DbFactory`, the interface that produces both repository instances.
 
@@ -74,7 +74,7 @@ Module-local Spring configuration calls the factory when the backend is selected
 
 ---
 
-## `:backend:db:postgres` — JPA/Postgres Implementation
+## `:backend:persistence:postgres` — JPA/Postgres Implementation
 
 **Purpose**: Concrete implementation of `DocPackageRepository` and `DocFileRepository` backed by Postgres via Spring Data JPA.
 
@@ -84,7 +84,7 @@ Module-local Spring configuration calls the factory when the backend is selected
 - Spring Data JPA `@Entity` classes for `DocPackage` and `DocFile`.
 - Spring Data `JpaRepository`-backed implementations.
 - Flyway migrations for schema management.
-- `PostgresDbFactory` is exposed through `PostgresDbConfiguration`, enabled when `docql.db.impl=postgres`.
+- `PostgresDbFactory` is exposed through `PostgresDbConfiguration`, enabled when `docql.persistence.impl=postgres`.
 
 **Extension points**:
 - To add a new DB backend (e.g., MySQL, MongoDB), create a new module (e.g., `:backend:db:mongodb`), implement both repository interfaces, create a factory, and add a `@ConditionalOnProperty` configuration for selection.
@@ -135,7 +135,7 @@ All of the above follow the same pattern: implement `StorageBackend`, create a `
 
 ---
 
-## `:backend:cje:api` — Content/Job Engine Contract
+## `:backend:job:api` — Content/Job Engine Contract
 
 **Purpose**: Defines the abstraction over a content processing and job execution engine. Decouples the act of publishing from the act of indexing.
 
@@ -159,7 +159,7 @@ All of the above follow the same pattern: implement `StorageBackend`, create a `
 
 ---
 
-## `:backend:cje:factory` — CJE Backend Selection
+## `:backend:job:factory` — CJE Backend Selection
 
 Defines `CjeFactory`:
 ```java
@@ -170,7 +170,7 @@ public interface CjeFactory {
 
 ---
 
-## `:backend:cje:local` — In-Process CJE Implementation
+## `:backend:job:local` — In-Process CJE Implementation
 
 **Purpose**: Runs jobs synchronously in the same JVM process. Designed for local development and early PoC.
 

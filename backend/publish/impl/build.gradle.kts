@@ -4,9 +4,9 @@ plugins {
 
 dependencies {
     implementation(project(":backend:core:api"))
-    implementation(project(":backend:db:api"))
+    implementation(project(":backend:persistence:api"))
     implementation(project(":backend:storage:api"))
-    implementation(project(":backend:cje:api"))
+    implementation(project(":backend:job:api"))
     implementation(project(":backend:publish:api"))
     implementation(project(":backend:publish:factory"))
 

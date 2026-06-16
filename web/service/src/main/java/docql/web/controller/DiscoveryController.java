@@ -1,15 +1,11 @@
 package docql.web.controller;
 
 import docql.discovery.DiscoveryService;
+import docql.web.api.DiscoveryApi;
 import docql.web.dto.DocFileDto;
 import docql.web.dto.DocPackageDto;
 import docql.web.mapper.WebMapper;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -27,10 +23,8 @@ import java.util.List;
  *   <li>GET /packages/{team}/{product}/{version}/files/{*path} — read a specific file</li>
  * </ul>
  */
-@Tag(name = "Discovery", description = "Browse and read published documentation packages")
 @RestController
-@RequestMapping("/packages")
-public class DiscoveryController {
+public class DiscoveryController implements DiscoveryApi {
 
     private final DiscoveryService discoveryService;
     private final WebMapper webMapper;
@@ -40,92 +34,65 @@ public class DiscoveryController {
         this.webMapper        = webMapper;
     }
 
-    @Operation(summary = "List packages", description = "Returns all packages, optionally filtered by team or tag.")
-    @ApiResponse(responseCode = "200", description = "Package list returned")
-    @GetMapping
-    public List<DocPackageDto> list(
-            @Parameter(description = "Filter by team name") @RequestParam(required = false) String team,
-            @Parameter(description = "Filter by tag")       @RequestParam(required = false) String tag
+    @Override
+    public List<DocPackageDto> listPackages(
+            String team,
+            String tag
     ) {
         if (team != null) return discoveryService.listByTeam(team).stream().map(webMapper::toDocPackageDto).toList();
         if (tag  != null) return discoveryService.listByTag(tag).stream().map(webMapper::toDocPackageDto).toList();
         return discoveryService.listAll().stream().map(webMapper::toDocPackageDto).toList();
     }
 
-    @Operation(summary = "Get latest version of a product")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Package metadata returned"),
-        @ApiResponse(responseCode = "404", description = "Product not found")
-    })
-    @GetMapping("/{team}/{product}")
+    @Override
     public DocPackageDto findLatest(
-            @PathVariable String team,
-            @PathVariable String product
+            String team,
+            String product
     ) {
         return discoveryService.findLatest(team, product)
                 .map(webMapper::toDocPackageDto)
                 .orElseThrow(() -> new ResourceNotFoundException(team, product, "latest"));
     }
 
-    @Operation(summary = "Get a specific version of a product")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Package metadata returned"),
-        @ApiResponse(responseCode = "404", description = "Version not found")
-    })
-    @GetMapping("/{team}/{product}/{version}")
+    @Override
     public DocPackageDto findVersion(
-            @PathVariable String team,
-            @PathVariable String product,
-            @PathVariable String version
+            String team,
+            String product,
+            String version
     ) {
         return discoveryService.findVersion(team, product, version)
                 .map(webMapper::toDocPackageDto)
                 .orElseThrow(() -> new ResourceNotFoundException(team, product, version));
     }
 
-    @Operation(summary = "List all files in a package version")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "File list returned"),
-        @ApiResponse(responseCode = "404", description = "Version not found")
-    })
-    @GetMapping("/{team}/{product}/{version}/files")
+    @Override
     public List<DocFileDto> listFiles(
-            @PathVariable String team,
-            @PathVariable String product,
-            @PathVariable String version
+            String team,
+            String product,
+            String version
     ) {
         return discoveryService.listFiles(team, product, version).stream()
                 .map(webMapper::toDocFileDto)
                 .toList();
     }
 
-    @Operation(summary = "Read the index file of a package version")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Index file content returned"),
-        @ApiResponse(responseCode = "404", description = "Version or index file not found")
-    })
-    @GetMapping("/{team}/{product}/{version}/index")
+    @Override
     public DocFileDto readIndex(
-            @PathVariable String team,
-            @PathVariable String product,
-            @PathVariable String version
+            String team,
+            String product,
+            String version
     ) {
         return discoveryService.readIndex(team, product, version)
                 .map(webMapper::toDocFileDto)
                 .orElseThrow(() -> new ResourceNotFoundException(team, product, version));
     }
 
-    @Operation(summary = "Read a specific file from a package version")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "File content returned"),
-        @ApiResponse(responseCode = "404", description = "File not found")
-    })
-    @GetMapping("/{team}/{product}/{version}/files/{*filePath}")
+    @Override
     public DocFileDto readFile(
-            @PathVariable String team,
-            @PathVariable String product,
-            @PathVariable String version,
-            @PathVariable String filePath
+            String team,
+            String product,
+            String version,
+            String filePath
     ) {
         return discoveryService.readFile(team, product, version, filePath)
                 .map(webMapper::toDocFileDto)

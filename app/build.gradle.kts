@@ -11,9 +11,9 @@ dependencies {
     implementation(project(":backend:core:api"))
 
     // db
-    implementation(project(":backend:db:api"))
-    implementation(project(":backend:db:factory"))
-    implementation(project(":backend:db:postgres"))
+    implementation(project(":backend:persistence:api"))
+    implementation(project(":backend:persistence:factory"))
+    implementation(project(":backend:persistence:postgres"))
 
     // storage
     implementation(project(":backend:storage:api"))
@@ -21,9 +21,9 @@ dependencies {
     implementation(project(":backend:storage:fs"))
 
     // cje
-    implementation(project(":backend:cje:api"))
-    implementation(project(":backend:cje:factory"))
-    implementation(project(":backend:cje:local"))
+    implementation(project(":backend:job:api"))
+    implementation(project(":backend:job:factory"))
+    implementation(project(":backend:job:local"))
 
     // publish
     implementation(project(":backend:publish:api"))
@@ -50,4 +50,5 @@ dependencies {
     implementation(libs.spring.boot.starter.data.jpa)
     runtimeOnly(libs.postgresql)
     implementation(libs.flyway.core)
+    implementation(libs.flyway.database.postgresql)
 }

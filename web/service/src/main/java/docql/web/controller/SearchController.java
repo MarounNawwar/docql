@@ -1,13 +1,10 @@
 package docql.web.controller;
 
 import docql.search.SearchEngine;
+import docql.web.api.SearchApi;
 import docql.web.dto.SearchResultDto;
 import docql.web.mapper.WebMapper;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -20,10 +17,8 @@ import java.util.List;
  *   <li>GET /search?q={query}&amp;tags={t1,t2}   — restrict by tags</li>
  * </ul>
  */
-@Tag(name = "Search", description = "Full-text search across all indexed documentation")
 @RestController
-@RequestMapping("/search")
-public class SearchController {
+public class SearchController implements SearchApi {
 
     private final SearchEngine searchEngine;
     private final WebMapper webMapper;
@@ -33,17 +28,15 @@ public class SearchController {
         this.webMapper    = webMapper;
     }
 
-    @Operation(summary = "Search documentation",
-               description = "Full-text search over title and content fields. "
-                           + "Optionally restrict results to a specific team or set of tags.")
-    @ApiResponse(responseCode = "200", description = "Ranked list of matching documents returned")
-    @GetMapping
+    @Override
     public List<SearchResultDto> search(
-            @Parameter(description = "Free-text search query", required = true) @RequestParam String q,
-            @Parameter(description = "Restrict to a team")  @RequestParam(required = false) String team,
-            @Parameter(description = "Filter by tags")      @RequestParam(required = false, defaultValue = "") List<String> tags
+            String q,
+            String team,
+            List<String> tags
     ) {
-        return searchEngine.search(q, tags, team).stream()
+        var safeTags = tags == null ? List.<String>of() : tags;
+
+        return searchEngine.search(q, safeTags, team).stream()
                 .map(webMapper::toSearchResultDto)
                 .toList();
     }
