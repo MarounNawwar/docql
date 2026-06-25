@@ -2,28 +2,25 @@ package docql.discovery;
 
 import docql.core.DocFile;
 import docql.core.DocPackage;
-
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Service contract for discovering and reading published documentation bundles.
- */
+/** Service contract for discovering and reading published documentation bundles. */
 public interface DiscoveryService {
 
-    List<DocPackage> listAll();
+  List<DocPackage> listAll(Integer offset, Integer limit);
 
-    List<DocPackage> listByTeam(String team);
+  List<DocPackage> listByTeam(String team, Integer offset, Integer limit);
 
-    List<DocPackage> listByTag(String tag);
+  List<DocPackage> listByTag(String tag, Integer offset, Integer limit);
 
-    Optional<DocPackage> findLatest(String team, String product);
+  Optional<DocPackage> findLatest(String team, String product);
 
-    Optional<DocPackage> findVersion(String team, String product, String version);
+  Optional<DocPackage> findVersion(String team, String product, String version);
 
-    Optional<DocFile> readIndex(String team, String product, String version);
+  Optional<DocFile> readIndex(String team, String product, String version);
 
-    Optional<DocFile> readFile(String team, String product, String version, String filePath);
+  Optional<DocFile> readFile(String team, String product, String version, String filePath);
 
-    List<DocFile> listFiles(String team, String product, String version);
+  List<DocFile> listFiles(String team, String product, String version);
 }

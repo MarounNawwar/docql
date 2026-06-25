@@ -7,6 +7,7 @@ plugins {
 spotless {
     java {
         target("src/**/*.java")
+        googleJavaFormat("1.22.0")
         trimTrailingWhitespace()
         endWithNewline()
         removeUnusedImports()
@@ -41,4 +42,3 @@ tasks.register("qualityCheck") {
 tasks.named("check") {
     dependsOn("qualityCheck")
 }
-

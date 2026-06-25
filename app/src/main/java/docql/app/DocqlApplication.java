@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication(scanBasePackages = {"docql"})
 public class DocqlApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(DocqlApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(DocqlApplication.class, args);
+  }
 }

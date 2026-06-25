@@ -1,8 +1,6 @@
 package docql.job;
 
-/**
- * Factory that produces a {@link CjeEngine}.
- */
+/** Factory that produces a {@link CjeEngine}. */
 public interface CjeFactory {
-    CjeEngine cjeEngine();
+  CjeEngine cjeEngine();
 }

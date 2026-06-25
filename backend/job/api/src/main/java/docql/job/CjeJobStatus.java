@@ -1,3 +1,7 @@
 package docql.job;
 
-public enum CjeJobStatus { SUCCESS, FAILED, SKIPPED }
+public enum CjeJobStatus {
+  SUCCESS,
+  FAILED,
+  SKIPPED
+}

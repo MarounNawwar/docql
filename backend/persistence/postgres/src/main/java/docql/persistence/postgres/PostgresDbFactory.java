@@ -5,27 +5,27 @@ import docql.persistence.DocFileRepository;
 import docql.persistence.DocPackageRepository;
 
 /**
- * Postgres-backed {@link DbFactory}.
- * Receives the Spring Data JPA repositories as constructor parameters so that
- * DocqlConfig remains the only class that knows about Spring beans.
+ * Postgres-backed {@link DbFactory}. Receives the Spring Data JPA repositories as constructor
+ * parameters so that DocqlConfig remains the only class that knows about Spring beans.
  */
 public class PostgresDbFactory implements DbFactory {
 
-    private final DocPackageRepository packageRepository;
-    private final DocFileRepository fileRepository;
+  private final DocPackageRepository packageRepository;
+  private final DocFileRepository fileRepository;
 
-    public PostgresDbFactory(DocPackageJpaRepository packageJpaRepo, DocFileJpaRepository fileJpaRepo) {
-        this.packageRepository = new PostgresDocPackageRepository(packageJpaRepo);
-        this.fileRepository    = new PostgresDocFileRepository(fileJpaRepo);
-    }
+  public PostgresDbFactory(
+      DocPackageJpaRepository packageJpaRepo, DocFileJpaRepository fileJpaRepo) {
+    this.packageRepository = new PostgresDocPackageRepository(packageJpaRepo);
+    this.fileRepository = new PostgresDocFileRepository(fileJpaRepo);
+  }
 
-    @Override
-    public DocPackageRepository packageRepository() {
-        return packageRepository;
-    }
+  @Override
+  public DocPackageRepository packageRepository() {
+    return packageRepository;
+  }
 
-    @Override
-    public DocFileRepository fileRepository() {
-        return fileRepository;
-    }
+  @Override
+  public DocFileRepository fileRepository() {
+    return fileRepository;
+  }
 }

@@ -1,8 +1,6 @@
 package docql.discovery;
 
-/**
- * Factory that produces a {@link DiscoveryService}.
- */
+/** Factory that produces a {@link DiscoveryService}. */
 public interface DiscoveryFactory {
-    DiscoveryService discoveryService();
+  DiscoveryService discoveryService();
 }

@@ -43,6 +43,16 @@ paths:
           required: false
           schema:
             type: string
+        - in: query
+          name: offset
+          required: false
+          schema:
+              type: integer
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
       responses:
         '200':
           description: Package list returned

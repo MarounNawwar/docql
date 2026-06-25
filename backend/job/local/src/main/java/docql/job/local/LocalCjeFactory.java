@@ -1,25 +1,26 @@
 package docql.job.local;
 
 import docql.job.*;
-
 import java.util.Map;
 
-/**
- * Local {@link CjeFactory} — wires the in-process engine with default handlers.
- */
+/** Local {@link CjeFactory} — wires the in-process engine with default handlers. */
 public class LocalCjeFactory implements CjeFactory {
 
-    private final CjeEngine engine;
+  private final CjeEngine engine;
 
-    public LocalCjeFactory() {
-        this.engine = new LocalCjeEngine(Map.of(
-                "VALIDATE_PACKAGE", job -> new CjeJobResult(job.id(), CjeJobStatus.SUCCESS, "Validation passed"),
-                "INDEX_PACKAGE",    job -> new CjeJobResult(job.id(), CjeJobStatus.SUCCESS, "Indexed successfully")
-        ));
-    }
+  public LocalCjeFactory() {
+    this.engine =
+        new LocalCjeEngine(
+            Map.of(
+                "VALIDATE_PACKAGE",
+                    job -> new CjeJobResult(job.id(), CjeJobStatus.SUCCESS, "Validation passed"),
+                "INDEX_PACKAGE",
+                    job ->
+                        new CjeJobResult(job.id(), CjeJobStatus.SUCCESS, "Indexed successfully")));
+  }
 
-    @Override
-    public CjeEngine cjeEngine() {
-        return engine;
-    }
+  @Override
+  public CjeEngine cjeEngine() {
+    return engine;
+  }
 }
