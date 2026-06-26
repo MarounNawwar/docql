@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":backend:publish:api"))
     implementation(project(":backend:discovery:api"))
     implementation(project(":backend:search:api"))
+    implementation(project(":backend:storage:api"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
 
@@ -27,6 +28,7 @@ testing {
                 implementation(project(":backend:publish:api"))
                 implementation(project(":backend:discovery:api"))
                 implementation(project(":backend:search:api"))
+                implementation(project(":backend:storage:api"))
                 implementation(libs.spring.boot.starter.web)
                 implementation(libs.spring.boot.starter.test)
             }

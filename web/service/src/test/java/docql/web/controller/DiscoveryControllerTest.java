@@ -6,6 +6,8 @@ import static org.mockito.Mockito.*;
 
 import docql.core.DocPackage;
 import docql.discovery.DiscoveryService;
+import docql.discovery.exception.DocFileNotFoundException;
+import docql.discovery.exception.PackageNotFoundException;
 import docql.web.dto.DocFileDto;
 import docql.web.dto.DocPackageDto;
 import docql.web.mapper.WebMapper;
@@ -93,7 +95,7 @@ class DiscoveryControllerTest {
     when(discoveryService.findLatest("eng", "missing")).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> controller.findLatest("eng", "missing"))
-        .isInstanceOf(ResourceNotFoundException.class);
+        .isInstanceOf(PackageNotFoundException.class);
   }
 
   @Test
@@ -111,7 +113,7 @@ class DiscoveryControllerTest {
     when(discoveryService.findVersion("eng", "docs", "9.9.9")).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> controller.findVersion("eng", "docs", "9.9.9"))
-        .isInstanceOf(ResourceNotFoundException.class);
+        .isInstanceOf(PackageNotFoundException.class);
   }
 
   @Test
@@ -145,7 +147,7 @@ class DiscoveryControllerTest {
     when(discoveryService.readIndex("eng", "docs", "1.0.0")).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> controller.readIndex("eng", "docs", "1.0.0"))
-        .isInstanceOf(ResourceNotFoundException.class);
+        .isInstanceOf(PackageNotFoundException.class);
   }
 
   @Test
@@ -166,6 +168,6 @@ class DiscoveryControllerTest {
     when(discoveryService.readFile("eng", "docs", "1.0.0", "nope.md")).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> controller.readFile("eng", "docs", "1.0.0", "nope.md"))
-        .isInstanceOf(ResourceNotFoundException.class);
+        .isInstanceOf(DocFileNotFoundException.class);
   }
 }

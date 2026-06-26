@@ -3,14 +3,21 @@ package docql.storage.fs;
 import static java.nio.file.Files.*;
 
 import docql.storage.StorageBackend;
+import docql.storage.exception.StorageDeleteException;
+import docql.storage.exception.StorageReadException;
+import docql.storage.exception.StorageWriteException;
 import java.io.*;
 import java.nio.file.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Local filesystem implementation of {@link StorageBackend}. */
 public class FilesystemStorageBackend implements StorageBackend {
+
+  private static final Logger log = LoggerFactory.getLogger(FilesystemStorageBackend.class);
 
   private final Path rootDir;
 
@@ -26,7 +33,8 @@ public class FilesystemStorageBackend implements StorageBackend {
       createDirectories(target.getParent());
       copy(content, target, StandardCopyOption.REPLACE_EXISTING);
     } catch (IOException e) {
-      throw new UncheckedIOException("Failed to store: " + key, e);
+      log.error("Storage write failed for key '{}'", key, e);
+      throw new StorageWriteException(key, e);
     }
   }
 
@@ -35,7 +43,8 @@ public class FilesystemStorageBackend implements StorageBackend {
     try {
       return newInputStream(rootDir.resolve(key));
     } catch (IOException e) {
-      throw new UncheckedIOException("Failed to retrieve: " + key, e);
+      log.error("Storage read failed for key '{}'", key, e);
+      throw new StorageReadException(key, e);
     }
   }
 
@@ -51,7 +60,8 @@ public class FilesystemStorageBackend implements StorageBackend {
           .map(p -> rootDir.relativize(p).toString().replace(File.separatorChar, '/'))
           .toList();
     } catch (IOException e) {
-      throw new UncheckedIOException("Failed to list prefix: " + prefix, e);
+      log.error("Storage list failed for prefix '{}'", prefix, e);
+      throw new StorageReadException("Failed to list storage prefix: " + prefix, e);
     }
   }
 
@@ -64,7 +74,8 @@ public class FilesystemStorageBackend implements StorageBackend {
     try (Stream<Path> paths = walk(base)) {
       paths.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
     } catch (IOException e) {
-      throw new UncheckedIOException("Failed to delete prefix: " + prefix, e);
+      log.error("Storage delete failed for prefix '{}'", prefix, e);
+      throw new StorageDeleteException(prefix, e);
     }
   }
 
@@ -77,7 +88,7 @@ public class FilesystemStorageBackend implements StorageBackend {
     try {
       createDirectories(rootDir);
     } catch (IOException e) {
-      throw new UncheckedIOException("Cannot create storage root: " + rootDir, e);
+      throw new StorageWriteException("Cannot create storage root: " + rootDir, e);
     }
   }
 }

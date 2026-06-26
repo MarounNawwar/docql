@@ -8,7 +8,7 @@ dependencies {
     implementation(project(":backend:persistence:factory"))
 
     // Spring Data JPA (entities + repositories live here)
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:3.3.0"))
+    implementation(platform(libs.spring.boot.dependencies))
     implementation(libs.spring.boot.starter.data.jpa)
 
     // MapStruct runtime (Mappers.getMapper)

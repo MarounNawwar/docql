@@ -28,12 +28,10 @@ dependencies {
     // publish
     implementation(project(":backend:publish:api"))
     implementation(project(":backend:publish:factory"))
-    implementation(project(":backend:publish:impl"))
 
     // discovery
     implementation(project(":backend:discovery:api"))
     implementation(project(":backend:discovery:factory"))
-    implementation(project(":backend:discovery:impl"))
 
     // search
     implementation(project(":backend:search:api"))

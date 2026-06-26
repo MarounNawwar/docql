@@ -1,16 +1,14 @@
 package docql.web.controller;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 /**
- * Thrown when a requested doc package or file is not found. Resolved to HTTP 404 by Spring's
- * exception-handling mechanism.
+ * @deprecated Use {@link docql.discovery.exception.PackageNotFoundException} or {@link
+ *     docql.discovery.exception.DocFileNotFoundException} instead. This class is retained only for
+ *     source compatibility and will be removed in a future release.
  */
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class ResourceNotFoundException extends RuntimeException {
+@Deprecated(forRemoval = true)
+public class ResourceNotFoundException extends docql.discovery.exception.PackageNotFoundException {
 
   public ResourceNotFoundException(String team, String product, String version) {
-    super("Package not found: " + team + "/" + product + "/" + version);
+    super(team, product, version);
   }
 }

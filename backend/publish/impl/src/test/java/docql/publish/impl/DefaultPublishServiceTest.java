@@ -1,5 +1,8 @@
 package docql.publish.impl;
 
+import static docql.scan.ScanResult.clean;
+import static docql.scan.ScanResult.malicious;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -12,8 +15,9 @@ import docql.job.CjeJobResult;
 import docql.job.CjeJobStatus;
 import docql.persistence.DocFileRepository;
 import docql.persistence.DocPackageRepository;
+import docql.publish.exception.InvalidPublishRequestException;
+import docql.publish.exception.PublishContentBlockedException;
 import docql.scan.FileScanService;
-import docql.scan.ScanResult;
 import docql.storage.StorageBackend;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -29,7 +33,7 @@ class DefaultPublishServiceTest {
     var fileRepository = new InMemoryDocFileRepository();
     var storageBackend = new RecordingStorageBackend();
     var cjeEngine = new RecordingCjeEngine();
-    FileScanService scanner = (path, content) -> ScanResult.clean("test");
+    FileScanService scanner = (path, content) -> clean("test");
     var service =
         new DefaultPublishService(
             packageRepository, fileRepository, storageBackend, cjeEngine, scanner);
@@ -59,7 +63,7 @@ class DefaultPublishServiceTest {
     var fileRepository = new InMemoryDocFileRepository();
     var storageBackend = new RecordingStorageBackend();
     var cjeEngine = new RecordingCjeEngine();
-    FileScanService scanner = (path, content) -> ScanResult.malicious("test", "blocked");
+    FileScanService scanner = (path, content) -> malicious("test", "blocked");
     var service =
         new DefaultPublishService(
             packageRepository, fileRepository, storageBackend, cjeEngine, scanner);
@@ -73,11 +77,45 @@ class DefaultPublishServiceTest {
             List.of(new DocFile("", "index.md", "Index", "bad")),
             "index.md");
 
-    assertThrows(IllegalArgumentException.class, () -> service.publish(request));
+    assertThrows(PublishContentBlockedException.class, () -> service.publish(request));
     assertEquals(0, storageBackend.storedKeys.size());
     assertEquals(0, fileRepository.files.size());
     assertEquals(0, packageRepository.packages.size());
     assertEquals(0, cjeEngine.jobs.size());
+  }
+
+  @Test
+  void publish_missingTeam_throwsInvalidPublishRequest() {
+    var service = serviceWithCleanScanner();
+    var request =
+        new PublishRequest(
+            "",
+            "product-a",
+            "1.0.0",
+            List.of(),
+            List.of(new DocFile("", "index.md", "Index", "content")),
+            "index.md");
+
+    var ex = assertThrows(InvalidPublishRequestException.class, () -> service.publish(request));
+    assertThat(ex.getDetails()).contains("team is required");
+  }
+
+  @Test
+  void publish_missingFiles_throwsInvalidPublishRequest() {
+    var service = serviceWithCleanScanner();
+    var request = new PublishRequest("team", "product", "1.0.0", List.of(), List.of(), "index.md");
+
+    var ex = assertThrows(InvalidPublishRequestException.class, () -> service.publish(request));
+    assertThat(ex.getDetails()).contains("at least one file is required");
+  }
+
+  private static DefaultPublishService serviceWithCleanScanner() {
+    return new DefaultPublishService(
+        new InMemoryDocPackageRepository(),
+        new InMemoryDocFileRepository(),
+        new RecordingStorageBackend(),
+        new RecordingCjeEngine(),
+        (path, content) -> clean("test"));
   }
 
   private static final class RecordingStorageBackend implements StorageBackend {

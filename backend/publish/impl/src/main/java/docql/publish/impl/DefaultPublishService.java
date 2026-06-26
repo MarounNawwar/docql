@@ -1,5 +1,6 @@
 package docql.publish.impl;
 
+import static java.util.Objects.isNull;
 import static java.util.UUID.randomUUID;
 
 import docql.core.DocFile;
@@ -10,18 +11,25 @@ import docql.job.CjeJob;
 import docql.persistence.DocFileRepository;
 import docql.persistence.DocPackageRepository;
 import docql.publish.PublishService;
+import docql.publish.exception.InvalidPublishRequestException;
+import docql.publish.exception.PublishContentBlockedException;
 import docql.scan.FileScanService;
 import docql.scan.ScanStatus;
 import docql.storage.StorageBackend;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default {@link PublishService} implementation. Flow: validate → store blobs → persist metadata →
  * trigger CJE job.
  */
 public class DefaultPublishService implements PublishService {
+
+  private static final Logger log = LoggerFactory.getLogger(DefaultPublishService.class);
 
   private final DocPackageRepository packageRepository;
   private final DocFileRepository fileRepository;
@@ -85,16 +93,25 @@ public class DefaultPublishService implements PublishService {
   }
 
   private void validate(PublishRequest request) {
-    if (request.team() == null || request.team().isBlank())
-      throw new IllegalArgumentException("team is required");
-    if (request.product() == null || request.product().isBlank())
-      throw new IllegalArgumentException("product is required");
-    if (request.version() == null || request.version().isBlank())
-      throw new IllegalArgumentException("version is required");
-    if (request.files() == null || request.files().isEmpty())
-      throw new IllegalArgumentException("at least one file is required");
-    if (request.indexFilePath() == null || request.indexFilePath().isBlank())
-      throw new IllegalArgumentException("indexFilePath is required");
+    var violations = new java.util.ArrayList<String>();
+    if (isNull(request.team()) || request.team().isBlank()) violations.add("team is required");
+    if (isNull(request.product()) || request.product().isBlank())
+      violations.add("product is required");
+    if (isNull(request.version()) || request.version().isBlank())
+      violations.add("version is required");
+    if (isNull(request.files()) || request.files().isEmpty())
+      violations.add("at least one file is required");
+    if (isNull(request.indexFilePath()) || request.indexFilePath().isBlank())
+      violations.add("indexFilePath is required");
+    if (!violations.isEmpty()) {
+      log.warn(
+          "Publish request validation failed for team={} product={} version={}: {}",
+          request.team(),
+          request.product(),
+          request.version(),
+          violations);
+      throw new InvalidPublishRequestException("Publish request validation failed", violations);
+    }
   }
 
   private String storageKey(String team, String product, String version, String path) {
@@ -112,7 +129,8 @@ public class DefaultPublishService implements PublishService {
     if (scanResult.status() == ScanStatus.CLEAN) {
       return;
     }
-    throw new IllegalArgumentException(
-        "file scan failed for " + file.path() + ": " + scanResult.message());
+    log.warn("Content scan blocked file '{}': {}", file.path(), scanResult.message());
+    throw new PublishContentBlockedException(
+        "File content blocked by scanner: " + file.path(), List.of(scanResult.message()));
   }
 }

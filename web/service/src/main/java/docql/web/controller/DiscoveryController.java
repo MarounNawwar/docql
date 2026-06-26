@@ -1,6 +1,8 @@
 package docql.web.controller;
 
 import docql.discovery.DiscoveryService;
+import docql.discovery.exception.DocFileNotFoundException;
+import docql.discovery.exception.PackageNotFoundException;
 import docql.web.api.DiscoveryApi;
 import docql.web.dto.DocFileDto;
 import docql.web.dto.DocPackageDto;
@@ -55,7 +57,7 @@ public class DiscoveryController implements DiscoveryApi {
     return discoveryService
         .findLatest(team, product)
         .map(webMapper::toDocPackageDto)
-        .orElseThrow(() -> new ResourceNotFoundException(team, product, "latest"));
+        .orElseThrow(() -> new PackageNotFoundException(team, product, "latest"));
   }
 
   @Override
@@ -63,7 +65,7 @@ public class DiscoveryController implements DiscoveryApi {
     return discoveryService
         .findVersion(team, product, version)
         .map(webMapper::toDocPackageDto)
-        .orElseThrow(() -> new ResourceNotFoundException(team, product, version));
+        .orElseThrow(() -> new PackageNotFoundException(team, product, version));
   }
 
   @Override
@@ -78,7 +80,7 @@ public class DiscoveryController implements DiscoveryApi {
     return discoveryService
         .readIndex(team, product, version)
         .map(webMapper::toDocFileDto)
-        .orElseThrow(() -> new ResourceNotFoundException(team, product, version));
+        .orElseThrow(() -> new PackageNotFoundException(team, product, version));
   }
 
   @Override
@@ -86,6 +88,6 @@ public class DiscoveryController implements DiscoveryApi {
     return discoveryService
         .readFile(team, product, version, filePath)
         .map(webMapper::toDocFileDto)
-        .orElseThrow(() -> new ResourceNotFoundException(team, product, version));
+        .orElseThrow(() -> new DocFileNotFoundException(team, product, version, filePath));
   }
 }

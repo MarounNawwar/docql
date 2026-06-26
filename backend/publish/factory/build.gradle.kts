@@ -5,4 +5,8 @@ plugins {
 dependencies {
     implementation(project(":backend:core:api"))
     implementation(project(":backend:publish:api"))
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:3.3.0"))
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
+
+    runtimeOnly(project(":backend:publish:impl"))
 }

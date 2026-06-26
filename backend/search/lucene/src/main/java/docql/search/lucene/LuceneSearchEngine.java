@@ -3,8 +3,9 @@ package docql.search.lucene;
 import docql.core.DocFile;
 import docql.core.SearchResult;
 import docql.search.SearchEngine;
+import docql.search.exception.InvalidSearchQueryException;
+import docql.search.exception.SearchIndexException;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -15,12 +16,16 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.*;
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Embedded Lucene {@link SearchEngine}. Uses an in-memory {@link ByteBuffersDirectory} by default.
  * Wire a {@link org.apache.lucene.store.FSDirectory} for persistence.
  */
 public class LuceneSearchEngine implements SearchEngine {
+
+  private static final Logger log = LoggerFactory.getLogger(LuceneSearchEngine.class);
 
   private static final String FIELD_PACKAGE_ID = "packageId";
   private static final String FIELD_TEAM = "team";
@@ -54,7 +59,8 @@ public class LuceneSearchEngine implements SearchEngine {
               FIELD_CONTENT, file.content() != null ? file.content() : "", Field.Store.NO));
       writer.addDocument(doc);
     } catch (IOException e) {
-      throw new UncheckedIOException("Failed to index file: " + file.path(), e);
+      log.error("Failed to index file '{}' for package '{}'", file.path(), file.packageId(), e);
+      throw new SearchIndexException("Failed to index file: " + file.path(), e);
     }
   }
 
@@ -63,7 +69,8 @@ public class LuceneSearchEngine implements SearchEngine {
     try (IndexWriter writer = new IndexWriter(directory, new IndexWriterConfig(analyzer))) {
       writer.deleteDocuments(new Term(FIELD_PACKAGE_ID, packageId));
     } catch (IOException e) {
-      throw new UncheckedIOException("Failed to deindex package: " + packageId, e);
+      log.error("Failed to deindex package '{}'", packageId, e);
+      throw new SearchIndexException("Failed to deindex package: " + packageId, e);
     }
   }
 
@@ -101,9 +108,11 @@ public class LuceneSearchEngine implements SearchEngine {
       }
       return results;
     } catch (IOException e) {
-      throw new UncheckedIOException("Search failed", e);
+      log.error("Search index I/O failure for query '{}'", query, e);
+      throw new SearchIndexException("Search failed", e);
     } catch (ParseException e) {
-      throw new IllegalArgumentException("Invalid search query: " + query, e);
+      log.warn("Invalid search query '{}'", query, e);
+      throw new InvalidSearchQueryException(query, e);
     }
   }
 }

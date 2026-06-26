@@ -1,6 +1,6 @@
 package docql.discovery.impl;
 
-import docql.discovery.DiscoveryService;
+import docql.discovery.DiscoveryFactory;
 import docql.persistence.DocFileRepository;
 import docql.persistence.DocPackageRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -17,8 +17,8 @@ import org.springframework.context.annotation.Configuration;
 public class DefaultDiscoveryConfiguration {
 
   @Bean
-  public DiscoveryService discoveryService(
+  public DiscoveryFactory discoveryFactory(
       DocPackageRepository packageRepository, DocFileRepository fileRepository) {
-    return new DefaultDiscoveryFactory(packageRepository, fileRepository).discoveryService();
+    return new DefaultDiscoveryFactory(packageRepository, fileRepository);
   }
 }

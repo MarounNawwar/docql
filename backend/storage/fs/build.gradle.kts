@@ -7,6 +7,7 @@ dependencies {
     implementation(project(":backend:storage:api"))
     implementation(project(":backend:storage:factory"))
 
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:3.3.0"))
-    implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation(platform(libs.spring.boot.dependencies))
+    implementation(libs.spring.boot.autoconfigure)
+    implementation("org.slf4j:slf4j-api")
 }
