@@ -1,0 +1,40 @@
+name: Java Build and Code Quality check
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master", "development"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      GITHUB_TOKEN: ${{ secrets.GPR_KEY }}
+      GITHUB_ACTOR: ${{ secrets.GPR_USERNAME }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      #      TODO: Setup caching gradle caching
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582
+
+      - name: Grant Execution permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build with
+        run: ./gradlew build -x test
+
+      - name: Spotless Check
+        run: ./gradlew spotlessCheck
+
+      - name: Run tests
+        run: ./gradlew test
