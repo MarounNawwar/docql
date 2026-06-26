@@ -30,3 +30,5 @@ docql:
   search:
     impl: ${DOCQL_SEARCH_IMPL:lucene}
     index-dir: ${DOCQL_SEARCH_INDEX_DIR:docql-index}
+  scan:
+    impl: ${DOCQL_SCAN_IMPL:local}

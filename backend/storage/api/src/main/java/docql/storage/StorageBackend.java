@@ -19,4 +19,18 @@ public interface StorageBackend {
   void deleteByPrefix(String prefix);
 
   boolean exists(String key);
+
+  /** Whether this backend can generate provider-specific presigned upload instructions. */
+  default boolean supportsPresignedUpload() {
+    return false;
+  }
+
+  /**
+   * Generate one presigned upload instruction for direct client upload.
+   *
+   * <p>Backends that do not support this capability should keep the default implementation.
+   */
+  default PresignedUpload createPresignedUpload(String key) {
+    throw new UnsupportedOperationException("Presigned upload is not supported by this backend");
+  }
 }

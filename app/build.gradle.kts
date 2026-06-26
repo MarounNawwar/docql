@@ -40,6 +40,11 @@ dependencies {
     implementation(project(":backend:search:factory"))
     implementation(project(":backend:search:lucene"))
 
+    // scan
+    implementation(project(":backend:scan:api"))
+    implementation(project(":backend:scan:factory"))
+    implementation(project(":backend:scan:local"))
+
     // web
     implementation(project(":backend:web:api"))
     implementation(project(":web:service"))

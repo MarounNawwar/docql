@@ -33,6 +33,11 @@ include(":backend:search:api")
 include(":backend:search:factory")
 include(":backend:search:lucene")
 
+// Malware scan abstraction
+include(":backend:scan:api")
+include(":backend:scan:factory")
+include(":backend:scan:local")
+
 // Web REST layer
 include(":backend:web:api")
 include(":web:service")

@@ -48,12 +48,12 @@ class DiscoveryControllerTest {
     when(webMapper.toDocPackageDto(pkg("p1"))).thenReturn(dto("p1"));
     when(webMapper.toDocPackageDto(pkg("p2"))).thenReturn(dto("p2"));
 
-    List<DocPackageDto> result = controller.listPackages(null, null, 0, 0);
+    List<DocPackageDto> result = controller.listPackages(null, null, null, null);
 
     assertThat(result).hasSize(2);
-    verify(discoveryService).listAll(null, null);
-    verify(discoveryService, never()).listByTeam(any(), null, null);
-    verify(discoveryService, never()).listByTag(any(), null, null);
+    verify(discoveryService).listAll(any(), any());
+    verify(discoveryService, never()).listByTeam(any(), any(), any());
+    verify(discoveryService, never()).listByTag(any(), any(), any());
   }
 
   @Test
@@ -61,7 +61,7 @@ class DiscoveryControllerTest {
     when(discoveryService.listByTeam("eng", null, null)).thenReturn(List.of(pkg("p1")));
     when(webMapper.toDocPackageDto(pkg("p1"))).thenReturn(dto("p1"));
 
-    List<DocPackageDto> result = controller.listPackages("eng", null, 0, 0);
+    List<DocPackageDto> result = controller.listPackages("eng", null, null, null);
 
     assertThat(result).hasSize(1);
     verify(discoveryService).listByTeam("eng", null, null);
@@ -72,7 +72,7 @@ class DiscoveryControllerTest {
     when(discoveryService.listByTag("api", null, null)).thenReturn(List.of(pkg("p1")));
     when(webMapper.toDocPackageDto(pkg("p1"))).thenReturn(dto("p1"));
 
-    List<DocPackageDto> result = controller.listPackages(null, "api", 0, 0);
+    List<DocPackageDto> result = controller.listPackages(null, "api", null, null);
 
     assertThat(result).hasSize(1);
     verify(discoveryService).listByTag("api", null, null);

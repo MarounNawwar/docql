@@ -1,5 +1,7 @@
 package docql.storage.fs;
 
+import static java.nio.file.Files.*;
+
 import docql.storage.StorageBackend;
 import java.io.*;
 import java.nio.file.*;
@@ -14,19 +16,15 @@ public class FilesystemStorageBackend implements StorageBackend {
 
   public FilesystemStorageBackend(Path rootDir) {
     this.rootDir = rootDir;
-    try {
-      Files.createDirectories(rootDir);
-    } catch (IOException e) {
-      throw new UncheckedIOException("Cannot create storage root: " + rootDir, e);
-    }
+    initializeIfNeeded(rootDir);
   }
 
   @Override
   public void store(String key, InputStream content) {
     Path target = rootDir.resolve(key);
     try {
-      Files.createDirectories(target.getParent());
-      Files.copy(content, target, StandardCopyOption.REPLACE_EXISTING);
+      createDirectories(target.getParent());
+      copy(content, target, StandardCopyOption.REPLACE_EXISTING);
     } catch (IOException e) {
       throw new UncheckedIOException("Failed to store: " + key, e);
     }
@@ -35,7 +33,7 @@ public class FilesystemStorageBackend implements StorageBackend {
   @Override
   public InputStream retrieve(String key) {
     try {
-      return Files.newInputStream(rootDir.resolve(key));
+      return newInputStream(rootDir.resolve(key));
     } catch (IOException e) {
       throw new UncheckedIOException("Failed to retrieve: " + key, e);
     }
@@ -44,8 +42,10 @@ public class FilesystemStorageBackend implements StorageBackend {
   @Override
   public List<String> list(String prefix) {
     Path base = rootDir.resolve(prefix);
-    if (!Files.exists(base)) return List.of();
-    try (Stream<Path> paths = Files.walk(base)) {
+    if (!Files.exists(base)) {
+      return List.of();
+    }
+    try (Stream<Path> paths = walk(base)) {
       return paths
           .filter(Files::isRegularFile)
           .map(p -> rootDir.relativize(p).toString().replace(File.separatorChar, '/'))
@@ -58,8 +58,10 @@ public class FilesystemStorageBackend implements StorageBackend {
   @Override
   public void deleteByPrefix(String prefix) {
     Path base = rootDir.resolve(prefix);
-    if (!Files.exists(base)) return;
-    try (Stream<Path> paths = Files.walk(base)) {
+    if (!Files.exists(base)) {
+      return;
+    }
+    try (Stream<Path> paths = walk(base)) {
       paths.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
     } catch (IOException e) {
       throw new UncheckedIOException("Failed to delete prefix: " + prefix, e);
@@ -69,5 +71,13 @@ public class FilesystemStorageBackend implements StorageBackend {
   @Override
   public boolean exists(String key) {
     return Files.exists(rootDir.resolve(key));
+  }
+
+  private static void initializeIfNeeded(Path rootDir) {
+    try {
+      createDirectories(rootDir);
+    } catch (IOException e) {
+      throw new UncheckedIOException("Cannot create storage root: " + rootDir, e);
+    }
   }
 }

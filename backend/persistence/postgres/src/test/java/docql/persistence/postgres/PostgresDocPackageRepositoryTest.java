@@ -24,8 +24,9 @@ class PostgresDocPackageRepositoryTest {
 
   private static final Instant NOW = Instant.parse("2026-01-01T00:00:00Z");
 
-  private static DocPackage sampleDomain(String id) {
-    return new DocPackage(id, "team-a", "product-x", "1.0.0", List.of("tag1"), NOW, "README.md");
+  private static DocPackage sampleDomain() {
+    return new DocPackage(
+        "pkg-1", "team-a", "product-x", "1.0.0", List.of("tag1"), NOW, "README.md");
   }
 
   private static DocPackageEntity sampleEntity(String id) {
@@ -42,7 +43,7 @@ class PostgresDocPackageRepositoryTest {
   void save_delegatesToJpaAndReturnsDomain() {
     when(jpa.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-    DocPackage result = repository.save(sampleDomain("pkg-1"));
+    DocPackage result = repository.save(sampleDomain());
 
     assertThat(result.id()).isEqualTo("pkg-1");
     verify(jpa).save(any(DocPackageEntity.class));
@@ -90,7 +91,7 @@ class PostgresDocPackageRepositoryTest {
 
   @Test
   void findAll_mapsAllEntitiesToDomain() {
-    when(jpa.findAll()).thenReturn(List.of(sampleEntity("pkg-1"), sampleEntity("pkg-2")));
+    when(jpa.findPage(any())).thenReturn(List.of(sampleEntity("pkg-1"), sampleEntity("pkg-2")));
 
     List<DocPackage> result = repository.findAll(null, null);
 
@@ -105,7 +106,7 @@ class PostgresDocPackageRepositoryTest {
     List<DocPackage> result = repository.findByTeam("team-a", null, null);
 
     assertThat(result).hasSize(1);
-    assertThat(result.get(0).team()).isEqualTo("team-a");
+    assertThat(result.getFirst().team()).isEqualTo("team-a");
   }
 
   @Test
@@ -115,7 +116,7 @@ class PostgresDocPackageRepositoryTest {
     List<DocPackage> result = repository.findByTag("tag1", null, null);
 
     assertThat(result).hasSize(1);
-    assertThat(result.get(0).tags()).contains("tag1");
+    assertThat(result.getFirst().tags()).contains("tag1");
   }
 
   @Test

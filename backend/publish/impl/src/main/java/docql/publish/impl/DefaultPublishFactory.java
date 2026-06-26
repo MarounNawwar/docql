@@ -5,6 +5,7 @@ import docql.persistence.DocFileRepository;
 import docql.persistence.DocPackageRepository;
 import docql.publish.PublishFactory;
 import docql.publish.PublishService;
+import docql.scan.FileScanService;
 import docql.storage.StorageBackend;
 
 /** Default {@link PublishFactory}. */
@@ -16,9 +17,11 @@ public class DefaultPublishFactory implements PublishFactory {
       DocPackageRepository packageRepository,
       DocFileRepository fileRepository,
       StorageBackend storageBackend,
+      FileScanService fileScanService,
       CjeEngine cjeEngine) {
     this.publishService =
-        new DefaultPublishService(packageRepository, fileRepository, storageBackend, cjeEngine);
+        new DefaultPublishService(
+            packageRepository, fileRepository, storageBackend, cjeEngine, fileScanService);
   }
 
   @Override

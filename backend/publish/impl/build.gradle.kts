@@ -7,6 +7,7 @@ dependencies {
     implementation(project(":backend:persistence:api"))
     implementation(project(":backend:storage:api"))
     implementation(project(":backend:job:api"))
+    implementation(project(":backend:scan:api"))
     implementation(project(":backend:publish:api"))
     implementation(project(":backend:publish:factory"))
 
